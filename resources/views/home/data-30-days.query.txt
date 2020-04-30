@@ -1,0 +1,14 @@
+// select records Positif, Sembuh, Meninggal for latest 30 days
+SELECT SUM(jumlah), created_at, updated_at, id_pasien_status 
+FROM `pasiens` 
+WHERE created_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW() 
+AND id_pasien_status IN(1, 2, 3) 
+GROUP BY date(updated_at), id_pasien_status
+
+// select records ODP, PDP, OTG (including with odp proses,...)
+SELECT SUM(jumlah), created_at, updated_at, id_pasien_status 
+FROM `pasiens` 
+WHERE created_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW() 
+AND id_pasien_status IN(4, 5, 6, 7, 8, 9, 10, 11, 12)
+GROUP BY date(updated_at), id_pasien_status
+
