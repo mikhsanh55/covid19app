@@ -11,7 +11,12 @@
 
     <link rel="stylesheet" href="{{ url('/vendor/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ url('/css/themes/lite-purple.min.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/themes/style.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/themes/animate.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/themes/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url('/css/themes/all.min.css') }}">
     <link rel="stylesheet" href="{{ url('/vendor/perfect-scrollbar.css') }}">
+
     <link rel="icon" href="{{ url('/images/papua.png') }}" type="image/png" sizes="16x16"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
     <style>
@@ -30,6 +35,34 @@
 </head>
 
 <body>
+	   <!-- Mobile Menu Start Here -->
+<div class="mobile-menu seo-bg">
+  <nav class="mobile-header">
+    <div class="header-logo">
+      <a href="site/index.html"><img src="{{ url('/images/covid.png') }}" width="250px" alt="logo"></a>
+    </div>
+    <div class="header-bar">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+  <nav class="mobile-menu">
+    <div class="mobile-menu-area">
+      <div class="mobile-menu-area-inner">
+        <ul class="lab-ul">
+          <li><a href="#">Home</a></li>
+              <li><a href="#">Data </a></li>             
+          <li><a href="#">Berita</a></li>
+          <li><a href="#">Kontak</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#"><span class="lab-btn">Call Center</span></a></li>          
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+<!-- Mobile Menu Ending Here -->
    <!-- Image and text -->
    <!-- Navbar -->
     <nav class="navbar navbar-expand-md navbar-light bg-white">

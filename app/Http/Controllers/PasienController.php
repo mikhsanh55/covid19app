@@ -81,16 +81,127 @@ class PasienController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $data_pasiens = DB::table('pasiens as p')
-                            ->where('tgl_input', $request->input('tgl_input'))
-                            ->where('id_kabkota', $request->input('kota'))
-                            ->where('id_pasien_status', $request->input('status'))
-                            ->get();
+        // $data_pasiens = DB::table('pasiens as p')
+        //                     ->where('tgl_input', $request->input('tgl_input'))
+        //                     ->where('id_kabkota', $request->input('kota'))
+        //                     ->where('id_pasien_status', $request->input('status'))
+        //                     ->get();
 
-        if($data_pasiens->count() > 0) {
-            return response()->json([
-                'msg' => ['Data pada tanggal ' . $request->input('tgl_input') . ' sudah ada']
-            ], 400);
+        // if($data_pasiens->count() > 0) {
+        //     return response()->json([
+        //         'msg' => ['Data pada tanggal ' . $request->input('tgl_input') . ' sudah ada']
+        //     ], 400);
+        // }
+
+        // Validation
+        if($request->input('status') == 1 || $request->input('status') == 3) {
+            $check_data_positif = DB::table('pasiens as p')
+                                        ->where('tgl_input', $request->input('tgl_input'))
+                                        ->where('id_kabkota', $request->input('kota'))
+                                        ->where('id_pasien_status', 2)
+                                        ->get();
+
+            $num = 0;
+            if($check_data_positif->count() > 0) {
+                foreach($check_data_positif as $data) {
+                    $num += $data->jumlah;
+                }
+
+                if($request->input('jumlah') > $num) {
+                    return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Jumlah data positif kurang']
+                    ], 400);
+                }
+            }
+            else {
+                return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Data pasien Positif Aktif belum ada, harap diinputkan terlebih dahulu']
+                    ], 400);
+            }
+        }
+        else if($request->input('status') == 7) { // Selesai ODP
+            $check_data_positif = DB::table('pasiens as p')
+                                        ->where('tgl_input', $request->input('tgl_input'))
+                                        ->where('id_kabkota', $request->input('kota'))
+                                        ->where('id_pasien_status', 4)
+                                        ->get();
+
+            $num = 0;
+            if($check_data_positif->count() > 0) {
+                foreach($check_data_positif as $data) {
+                    $num += $data->jumlah;
+                }
+
+                if($request->input('jumlah') > $num) {
+                    return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Jumlah data proses ODP kurang']
+                    ], 400);
+                }
+            }
+            else {
+                return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Data pasien proses ODP belum ada, harap diinputkan terlebih dahulu']
+                    ], 400);
+            }
+        }
+
+        else if($request->input('status') == 8) { // Selesai PDP
+            $check_data_positif = DB::table('pasiens as p')
+                                        ->where('tgl_input', $request->input('tgl_input'))
+                                        ->where('id_kabkota', $request->input('kota'))
+                                        ->where('id_pasien_status', 5)
+                                        ->get();
+
+            $num = 0;
+            if($check_data_positif->count() > 0) {
+                foreach($check_data_positif as $data) {
+                    $num += $data->jumlah;
+                }
+
+                if($request->input('jumlah') > $num) {
+                    return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Jumlah data proses PDP kurang']
+                    ], 400);
+                }
+            }
+            else {
+                return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Data pasien proses PDP belum ada, harap diinputkan terlebih dahulu']
+                    ], 400);
+            }
+        }
+        else if($request->input('status') == 11) { // Selesai ODP
+            $check_data_positif = DB::table('pasiens as p')
+                                        ->where('tgl_input', $request->input('tgl_input'))
+                                        ->where('id_kabkota', $request->input('kota'))
+                                        ->where('id_pasien_status', 6)
+                                        ->get();
+
+            $num = 0;
+            if($check_data_positif->count() > 0) {
+                foreach($check_data_positif as $data) {
+                    $num += $data->jumlah;
+                }
+
+                if($request->input('jumlah') > $num) {
+                    return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Jumlah data proses OTG kurang']
+                    ], 400);
+                }
+            }
+            else {
+                return response()->json([
+                        'status' => FALSE,
+                        'msg' => ['Data pasien proses OTG belum ada, harap diinputkan terlebih dahulu']
+                    ], 400);
+            }
         }
 
         // Set Proses data untuk pengurangan jika memilih status 7, 8, 11
@@ -102,16 +213,16 @@ class PasienController extends Controller
         */
 
         // 1. Get data yang ada berdasarkan status
-        $availableData = Pasien::get_data_by('id_pasien_status', $request->input('status'), $request->all());
+        $availableData = Pasien::get_data1_by('id_pasien_status', $request->input('status'), $request->all());
         // 2. Jumlahkan Data yang akan diinsert dengan data yang udah di get sebelumnya sesuai status
         $requestData = $request->all();
         $jumlah = $requestData['jumlah'];
         if($availableData->count() > 0) {
-            foreach($availableData as $i => $data) {
-                $jumlah += $data->jumlah;
-            }
+            // foreach($availableData as $i => $data) {
+                $jumlah += $availableData[0]->sum_jumlah;
+            // }
         }
-        $requestData['jumlah'] = $jumlah;
+        $requestData['sum_jumlah'] = $jumlah;
 
         // return response()->json([
         //     'status' => TRUE,
@@ -122,7 +233,8 @@ class PasienController extends Controller
         $data->id_kabkota = $requestData['kota'];
         $data->id_pasien_status = $requestData['status'];
         $data->tgl_input = $requestData['tgl_input'];
-        $data->jumlah = $requestData['jumlah'];            
+        $data->jumlah = $requestData['jumlah'];      
+        $data->sum_jumlah = $requestData['sum_jumlah'];
 
         if($data->save()) {
             return response()->json([
@@ -309,5 +421,99 @@ class PasienController extends Controller
             'status' => TRUE,
             'data' => $data_pasien
         ]);
+    }
+
+    public function importCsv(Request $request) {
+        // set validation
+        
+
+        // set temporary path from uploaded file
+        $file = $request->file('uploaded_file');
+        $filename = $file->getClientOriginalName();
+        $ext = $file->getClientOriginalExtension();
+        $tempPath = $file->getRealPath();
+
+        $valid_ext = ['csv'];
+
+        
+
+
+        // if uploaded file is csv
+        if(in_array(strtolower($ext), $valid_ext)) {
+            $location = 'uploads';
+            $file->move($location, $filename);
+
+            $filepath = public_path($location . "/" . $filename);
+            // Read file
+            $file = fopen($filepath, "r");
+            $import_data = [];
+            $i = 0;
+            $columns = fgetcsv($file);
+
+            while(!feof($file)) {
+                $import_data[$i][] = fgetcsv($file);
+                $i++;
+            }
+            fclose($file);
+            array_pop($import_data);
+            $inserted_data = [];$harian = [];
+            if(count($import_data) > 0) {
+                foreach($import_data as $ind => $row) {
+                    
+                    // Add for data table
+                    if(count($inserted_data) >= 1) {
+                        $jumlah = intval($row[0][3]);
+                        $arrayStatus = [];
+                        foreach($inserted_data as $data) {
+                            if($row[0][1] == $data['id_pasien_status'] && $row[0][0] == $data['id_kabkota']) {
+                                $arrayStatus[] = $data['sum_jumlah'];    
+                            }
+                        }
+
+                        $jumlah += end($arrayStatus);
+
+                        $inserted_data[] = [
+                            'id_kabkota' => $row[0][0],
+                            'id_pasien_status' => $row[0][1],
+                            'tgl_input' => $row[0][2],
+                            'jumlah' => intval($row[0][3]),
+                            'sum_jumlah' => $jumlah
+                        ];
+                    }
+                    else {
+                        $inserted_data[] = [
+                            'id_kabkota' => $row[0][0],
+                            'id_pasien_status' => $row[0][1],
+                            'tgl_input' => $row[0][2],
+                            'jumlah' => intval($row[0][3]),
+                            'sum_jumlah' => intval($row[0][3])
+                        ];
+                    }
+
+                }
+
+                $inserted = Pasien::insert($inserted_data);
+                if($inserted) {
+                    return response()->json([
+                        'status' => TRUE,
+                        'msg' => 'Data berhasil ditambah'
+                    ], 200);
+                }
+                else {
+                    return response()->json([
+                        'status' => TRUE,
+                        'msg' => 'Data gagal ditambah',
+                        'array' => $arrayStatus
+                    ], 500);
+                }
+
+            }
+            else {
+                return response()->json([
+                    'status' => FALSE,
+                    'msg' => ['Your file must be have at least 1 data']
+                ], 400);
+            }
+        }
     }
 }

@@ -21,8 +21,23 @@
                      <div class="card-body">
                         <div class="card-title mb-3">Tambah Data</div>
                         <div class="mt-4 mb-4" id="errors-display"></div>
+                        <!-- Form import excel -->
+                        <!-- <form autocomplete="off" id="import-excel-form">
+                            <div class="form-group row">
+                                <label for="uploaded_file">File excel .xlsx, .xls</label>
+                                <div class="col-sm-12">
+                                    <input type="file" id="uploaded_file" class="form-control" required>
+                                </div>
+                            </div>    
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <button type="submit" id="btn-import" class="btn btn-sm btn-success">Import</button>
+                                </div>
+                            </div>
+                        </form> -->
+
                         <form id="form-add-pasien" autocomplete="off">
-                            <input type="hidden" name="_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="_token" value="{{csrf_token()}}" id="_token">
                             <div class="form-group row">
                                 <label for="kabkota" class="col-sm-2 col-form-label">Kab / Kota</label>
                                 <div class="col-sm-10">
@@ -182,17 +197,17 @@
                                             <tr>
                                                 <td>{{++$no2}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{$pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']}}</td>
+                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) }}</td>
                                                 <td>{{$pasien->data['Selesai OTG']}}</td>
-                                                <td>{{$pasien->data['Proses OTG']}}</td>
+                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) + $pasien->data['Selesai OTG'] }}</td>
 
                                                 <td>{{$pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']}}</td>
                                                 <td>{{$pasien->data['Selesai ODP']}}</td>
-                                                <td>{{$pasien->data['Proses ODP']}}</td>
+                                                <td>{{ ($pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']) + $pasien->data['Selesai ODP'] }}</td>
 
                                                 <td>{{$pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']}}</td>
                                                 <td>{{$pasien->data['Selesai PDP']}}</td>
-                                                <td>{{$pasien->data['Proses PDP']}}</td>
+                                                <td>{{ ($pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']) + $pasien->data['Selesai PDP'] }}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -289,10 +304,11 @@
                                 <tr>
                                     <td>${++no}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Positif Aktif']}</td>
+                                    <td>${item.data['Positif Aktif'] - item.data['Sembuh'] - item.data['Meninggal']}</td>
+                                    
                                     <td>${item.data['Sembuh']}</td>
                                     <td>${item.data['Meninggal']}</td>
-                                    <td>${item.data['Positif Aktif'] + item.data['Sembuh'] + item.data['Meninggal']}</td>
+                                    <td>${item.data['Positif Aktif']}</td>
                                     <td class="btn-group w-100">
                                         <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
                                     </td>
@@ -302,17 +318,17 @@
                                 <tr>
                                     <td>${++no2}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Proses OTG']}</td>
+                                    <td>${item.data['Proses OTG'] - item.data['Selesai OTG']}</td>
                                     <td>${item.data['Selesai OTG']}</td>
-                                    <td>${item.data['Proses OTG'] + item.data['Selesai OTG']}</td>
+                                    <td>${item.data['Proses OTG']}</td>
 
-                                    <td>${item.data['Proses ODP']}</td>
+                                    <td>${item.data['Proses ODP'] - item.data['Selesai ODP']}</td>
                                     <td>${item.data['Selesai ODP']}</td>
-                                    <td>${item.data['Proses ODP'] + item.data['Selesai ODP']}</td>
+                                    <td>${item.data['Proses ODP']}</td>
 
-                                    <td>${item.data['Proses PDP']}</td>
+                                    <td>${item.data['Proses PDP'] - item.data['Selesai PDP']}</td>
                                     <td>${item.data['Selesai PDP']}</td>
-                                    <td>${item.data['Proses PDP'] + item.data['Selesai PDP']}</td>
+                                    <td>${item.data['Proses PDP']}</td>
                                     
                                     <td class="btn-group w-100">
                                         <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
@@ -351,6 +367,53 @@
                 $('#opsi-status').html(html)
                 $('#opsi-status').removeAttr('disabled')
             })
+
+            // Import data
+            $('#import-excel-form').submit(function(e) {
+                e.preventDefault()
+
+                var formData = new FormData()
+                formData.append('uploaded_file', $('#uploaded_file').prop('files')[0])
+                formData.append('_token', $('#_token').val())
+
+                $('#errors-display').empty()
+                $('#btn-import').html('Loading...').prop('disabled', true)
+                $.ajax({
+                    type:'POST',
+                    url: '/pasien/import',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function(data) {
+                        $('#btn-import').html('Import').removeAttr('disabled')
+                        alert(data.msg)
+                    },
+                    statusCode: {
+                        400: function(resp) {
+                            $('#btn-import').html('Import').removeAttr('disabled')
+                            var errors = resp.responseJSON, errorsHtml = ''
+                            for(var error in errors) {
+                                errorsHtml = `
+                                <p class="alert alert-danger">
+                                    <small>${errors[error][0]}</small>
+                                </p>`
+                            }
+                            $('#errors-display').html(errorsHtml)
+                        },
+                        500: function(resp) {
+                            $('#btn-import').html('Import').removeAttr('disabled')
+                            alert('Something errors on server')
+                            return false
+                        }
+                    }
+                }).done(function() {
+                    $('#btn-import').html('Import').removeAttr('disabled')
+                    window.location.reload()
+                })
+            })
+
+            // Insert data
             $('#form-add-pasien').submit(function(e) {
                 e.preventDefault()
                 $('#errors-display').empty()

@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Crypt;
 
 class Pasien extends Model
 {
+    protected $guarded = [];
     protected $table = 'pasiens';
     private $latest_date;
-    protected $fillable = ['id_kabkota', 'id_kecamatan', 'id_kelurahan', 'id_pasien_status', 'nama', 'nik', 'umur', 'jk', 'tgl_input', 'rawat', 'latitude', 'longitude'];
+    protected $fillable = ['id_kabkota', 'id_kecamatan', 'id_kelurahan', 'id_pasien_status', 'nama', 'nik', 'umur', 'jk', 'tgl_input', 'rawat', 'latitude', 'longitude', 'jumlah', 'sum_jumlah'];
 
     // Untuk kepentingan Join
     public function __construct()
@@ -119,10 +120,11 @@ class Pasien extends Model
  
         // Get semua data pasien di group berdasarkan statusnya
         $datas = DB::table('pasiens as p')
-                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, s.key as status, tgl_input'))
+                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, p.id_pasien_status as status, tgl_input, sum_jumlah'))
                     ->join('pasien_status as s', 'p.id_pasien_status', '=', 's.key')
-                    ->groupBy('s.key', 'p.id_kabkota', 's.value', 'p.tgl_input')
-                    ->orderBy('p.tgl_input', 'desc')
+                    ->where('tgl_input', '<=', $this->latest_date)
+                    ->groupBy('p.id_pasien_status', 'p.id_kabkota', 's.value', 'p.tgl_input')
+                    ->orderBy('tgl_input', 'desc')
                     ->get();
         $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'Selesai ODP', 'Proses ODP', 'Selesai PDP', 'Proses PDP', 'Selesai OTG', 'Proses OTG'];
 
@@ -132,11 +134,11 @@ class Pasien extends Model
                 // Seleksi data, ambil data yang ada diantara 3 kategori Positif, ODP, PDP, dan OTG
                 if($data->id_kabkota == $kota->id) {
                     if($data->tgl_input == $this->check_latest_date($data)) {
-                        $kota->data[$data->value] = $data->jml;    
+                        $kota->data[$data->value][] = $data->sum_jumlah;    
                     }
-                    else {
-                        unset($datas[$key]);
-                    }
+                    // else {
+                    //     unset($datas[$key]);
+                    // }
                     
                 }
             }
@@ -145,6 +147,9 @@ class Pasien extends Model
             for($i = 0;$i < count($category);$i++) {
                 if(!isset($kota->data[$category[$i]])) {
                     $kota->data[$category[$i]] = 0;
+                }
+                else {
+                    $kota->data[$category[$i]] = $kota->data[$category[$i]][0];
                 }
             }
             $kota->encrypt_id = Crypt::encrypt($kota->id);
@@ -159,18 +164,7 @@ class Pasien extends Model
     private function check_latest_date($data, $single = false) {
         $whereIn = [];
         if($single == false) {
-            if($data->status == 1 || $data->status == 2 || $data->status == 3) {
-                $whereIn = [1, 2, 3];
-            }
-            else if($data->status == 4 || $data->status == 7) {
-                $whereIn = [4, 7];
-            }
-            else if($data->status == 5 || $data->status == 8) {
-                $whereIn = [5, 8];
-            }
-            else if($data->status == 6 || $data->status == 11) {
-                $whereIn = [6, 11];
-            }
+                        $whereIn = [$data->status];
         }
         else {
             $whereIn = [$data->status];
@@ -179,11 +173,11 @@ class Pasien extends Model
                         ->select(DB::raw('MAX(tgl_input) as latest_date, id_pasien_status, jumlah, id_kabkota'))
                         ->whereIn('id_pasien_status', $whereIn)
                         ->where('id_kabkota', $data->id_kabkota)
+                        ->whereDate('tgl_input', '<=', $data->tgl_input)
                         ->groupBy('id_kabkota', 'id_pasien_status', 'jumlah')
                         ->orderBy('latest_date', 'desc')
                         ->get();
         return $check[0]->latest_date;
-        
     }
 
     // Untuk data harian
@@ -256,132 +250,20 @@ class Pasien extends Model
     */
     public function Scopeget_coordinates()
     {
-        $kotas = DB::table('wilayah_kabkota as wk')
-                    ->where('wk.id_provinsi', 33)
-                    ->get();            
-        foreach ($kotas as $i => $kota) {
-            $kota->encrypt_id = Crypt::encrypt($kota->id);
-            $kota->data = [];
-            $kota->data_id = [];
+        // Set global date to latest updated date in db
+        $this->latest_date = $this->get_latest_date();
+
+        // get datas
+        $kotas = Pasien::get_datas();
+
+        foreach($kotas as $i => $kota) {
+            $kota->data['Proses ODP'] = $kota->data['Proses ODP'] - $kota->data['Selesai ODP'];
+            $kota->data['Proses PDP'] = $kota->data['Proses PDP'] - $kota->data['Selesai PDP'];
+            $kota->data['Proses OTG'] = $kota->data['Proses OTG'] - $kota->data['Selesai OTG'];
+            $kota->data['Positif Aktif'] = ($kota->data['Positif Aktif'] - $kota->data['Sembuh']) - $kota->data['Meninggal'];
         }
 
-        // Get semua data pasien di group berdasarkan statusnya
-        $datas = DB::table('pasiens as p')
-                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, s.key as status, tgl_input'))
-                    ->join('pasien_status as s', 'p.id_pasien_status', '=', 's.key')
-                    ->groupBy('s.key', 'p.id_kabkota', 's.value', 'p.tgl_input')
-                    ->orderBy('p.tgl_input', 'desc')
-                    ->get();
-
-        // Cocokan, jika cocok masukan data pasien ke data kota 
-        foreach ($kotas as $i => $kota) {
-            foreach ($datas as $key => $data) {
-                if($data->id_kabkota == $kota->id) {
-                    if($data->tgl_input == $this->check_latest_date($data, true)) {
-                        $kota->data[$data->value] = $data->jml;
-                        $kota->data_id[$data->value] = $data->status;
-                        // $kota->data_longlat[$data->value] = [
-                        //     'latitude' => $datas[$data->value]->latitude,
-                        //     'longitude' => $datas[$data->value]->longitude
-                        // ];
-
-                        if(!array_key_exists('Sembuh', $kota->data)) {
-                            $kota->data['Sembuh'] = 0;
-                            $kota->data_id['Sembuh'] = 1;       
-                            
-                        }
-                        if(!array_key_exists('Positif Aktif', $kota->data)) {
-                            $kota->data['Positif Aktif'] = 0;
-                            $kota->data_id['Positif Aktif'] = 2;       
-                            
-                        }
-                        if(!array_key_exists('Meninggal', $kota->data)) {
-                            $kota->data['Meninggal'] = 0;
-                            $kota->data_id['Meninggal'] = 3;  
-                            
-                        }
-                        if(!array_key_exists('Proses ODP', $kota->data)) {
-                            $kota->data['Proses ODP'] = 0;
-                            $kota->data_id['Proses ODP'] = 4;       
-                            
-                        }
-                        if(!array_key_exists('Selesai ODP', $kota->data)) {
-                            $kota->data['Selesai ODP'] = 0;
-                            $kota->data_id['Selesai ODP'] = 7;       
-                            
-                        }
-                        if(!array_key_exists('Proses PDP', $kota->data)) {
-                            $kota->data['Proses PDP'] = 0;
-                            $kota->data_id['Proses PDP'] = 5;       
-                            
-                        }
-                        if(!array_key_exists('Selesai PDP', $kota->data)) {
-                            $kota->data['Selesai PDP'] = 0;
-                            $kota->data_id['Selesai PDP'] = 8;       
-                        }
-                        if(!array_key_exists('Proses OTG', $kota->data)) {
-                            $kota->data['Proses OTG'] = 0;
-                            $kota->data_id['Proses OTG'] = 6;       
-                            
-                        }
-                        if(!array_key_exists('Selesai OTG', $kota->data)) {
-                            $kota->data['Selesai OTG'] = 0;
-                            $kota->data_id['Selesai OTG'] = 11;       
-                        }
-                    }
-                    else {
-                        unset($data);
-                    }
-                    
-                }
-                else {
-                    if(!array_key_exists('Sembuh', $kota->data)) {
-                        $kota->data['Sembuh'] = 0;
-                        $kota->data_id['Sembuh'] = 1;
-                        
-                    }
-                    if(!array_key_exists('Positif Aktif', $kota->data)) {
-                        $kota->data['Positif Aktif'] = 0;
-                        $kota->data_id['Positif Aktif'] = 2;       
-                        
-                    }
-                    if(!array_key_exists('Meninggal', $kota->data)) {
-                        $kota->data['Meninggal'] = 0;
-                        $kota->data_id['Meninggal'] = 3;  
-                        
-                    }
-                    if(!array_key_exists('Proses ODP', $kota->data)) {
-                        $kota->data['Proses ODP'] = 0;
-                        $kota->data_id['Proses ODP'] = 4;       
-                        
-                    }
-                    if(!array_key_exists('Selesai ODP', $kota->data)) {
-                        $kota->data['Selesai ODP'] = 0;
-                        $kota->data_id['Selesai ODP'] = 7;       
-                        
-                    }
-                    if(!array_key_exists('Proses PDP', $kota->data)) {
-                        $kota->data['Proses PDP'] = 0;
-                        $kota->data_id['Proses PDP'] = 5;       
-                        
-                    }
-                    if(!array_key_exists('Selesai PDP', $kota->data)) {
-                        $kota->data['Selesai PDP'] = 0;
-                        $kota->data_id['Selesai PDP'] = 8;       
-                    }
-                    if(!array_key_exists('Proses OTG', $kota->data)) {
-                        $kota->data['Proses OTG'] = 0;
-                        $kota->data_id['Proses OTG'] = 6;       
-                        
-                    }
-                    if(!array_key_exists('Selesai OTG', $kota->data)) {
-                        $kota->data['Selesai OTG'] = 0;
-                        $kota->data_id['Selesai OTG'] = 11;       
-                    }
-                }
-            }
-        }      
-        return $kotas;            
+        return $kotas;
     }
 
     /*
@@ -398,7 +280,6 @@ class Pasien extends Model
         $data = [];
         $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'ODP', 'Selesai ODP', 'Proses ODP', 'PDP', 'Selesai PDP', 'Proses PDP', 'OTG', 'Selesai OTG', 'Proses OTG'];
         foreach($result as $res) {
-            
             $data[$res->value] = $res->jml;
         }
         for($i = 0;$i < count($category);$i++) {
@@ -458,7 +339,7 @@ class Pasien extends Model
                     break;
 
                     case 'Selesai ODP':
-                        $datas[$i]['data']['ODP'][] = $d->jml;
+                        $datas[$i]['data']['ODPS'][] = $d->jml;
                     break;
 
                     case 'Proses PDP':
@@ -466,7 +347,7 @@ class Pasien extends Model
                     break;
 
                     case 'Selesai PDP':
-                        $datas[$i]['data']['PDP'][] = $d->jml;
+                        $datas[$i]['data']['PDPS'][] = $d->jml;
                     break;
 
                     case 'Proses OTG':
@@ -474,7 +355,7 @@ class Pasien extends Model
                     break;
 
                     case 'Selesai OTG':
-                        $datas[$i]['data']['OTG'][] = $d->jml;
+                        $datas[$i]['data']['OTGS'][] = $d->jml;
                     break;
                 }
             }
@@ -506,17 +387,36 @@ class Pasien extends Model
             else {
                 $datas[$i]['data']['ODP'] = 0;       
             }
+
+            if(isset($datas[$i]['data']['ODPS'])) {
+                $datas[$i]['data']['ODPS'] = array_sum($datas[$i]['data']['ODPS']);
+            }
+            else {
+                $datas[$i]['data']['ODPS'] = 0;       
+            }
             if(isset($datas[$i]['data']['PDP'])) {
                 $datas[$i]['data']['PDP'] = array_sum($datas[$i]['data']['PDP']);
             }
             else {
                 $datas[$i]['data']['PDP'] = 0;       
             }
+            if(isset($datas[$i]['data']['PDPS'])) {
+                $datas[$i]['data']['PDPS'] = array_sum($datas[$i]['data']['PDPS']);
+            }
+            else {
+                $datas[$i]['data']['PDPS'] = 0;       
+            }
             if(isset($datas[$i]['data']['OTG'])) {
                 $datas[$i]['data']['OTG'] = array_sum($datas[$i]['data']['OTG']);
             }
             else {
                 $datas[$i]['data']['OTG'] = 0;       
+            }
+            if(isset($datas[$i]['data']['OTGS'])) {
+                $datas[$i]['data']['OTGS'] = array_sum($datas[$i]['data']['OTGS']);
+            }
+            else {
+                $datas[$i]['data']['OTGS'] = 0;       
             }
         }
 
@@ -589,6 +489,16 @@ class Pasien extends Model
         $result = DB::table($this->table)
                         ->where($field, $where)
                         ->where('id_kabkota', $datas['kota'])
+                        ->orderBy('tgl_input', 'desc')
+                        ->get();
+
+        return $result;
+    }
+    public function Scopeget_data1_by($query, $field, $where, $datas) {
+        $result = DB::table($this->table)
+                        ->where($field, $where)
+                        ->where('id_kabkota', $datas['kota'])
+                        ->orderBy('tgl_input', 'desc')
                         ->get();
 
         return $result;

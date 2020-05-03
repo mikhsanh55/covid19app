@@ -17,50 +17,16 @@ $.ajax({
       res.data.forEach(function(dt, index) {
 
         for(let key in dt.data) {
+          // dt.data['Positif Aktif'] = (dt.data['Positif Aktif'] - dt.data['Sembuh']) - dt.data['Meninggal']
+          // dt.data['Proses ODP']  = dt.data['Proses ODP'] - dt.data['Selesai ODP']
+          // dt.data['Proses PDP']  = dt.data['Proses PDP'] - dt.data['Selesai PDP']
+          // dt.data['Proses OTG']  = dt.data['Proses OTG'] - dt.data['Selesai OTG']
           data_wilayah.push({
             lat: dt.latitude,
             lng: dt.longitude,
             data: dt.data
           })
-          switch(key) {
-            case 'Sembuh' :
-              labelStatus = 'Sembuh'
-              jumlah = dt.data['Sembuh']
-            break;
-            case 'Positif Aktif':
-              labelStatus = 'Positif Aktif'
-              jumlah = dt.data['Positif Aktif']
-            break;
-            case 'Meninggal':
-              labelStatus = 'Meninggal'
-              jumlah = dt.data['Meninggal']
-            break;
-            case 'Proses ODP':
-              labelStatus = 'Proses ODP'
-              jumlah = dt.data['Proses ODP']
-            break;
-            case 'Selesai ODP':
-              labelStatus = 'Selesai ODP'
-              jumlah = dt.data['Selesai ODP']
-            break;
-            case 'Proses PDP':
-              labelStatus = 'Proses PDP'
-              jumlah = dt.data['Proses PDP']
-            break;
-            case 'Selesai PDP':
-              labelStatus = 'Selesai PDP'
-              jumlah = dt.data['Selesai PDP']
-            break;
-            case 'Proses OTG':
-              labelStatus = 'Proses OTG'
-              jumlah = dt.data['Proses OTG']
-            break;
-            case 'Selesai OTG':
-              labelStatus = 'Selesai OTG'
-              jumlah = dt.data['Selesai OTG']
-            break;
           }
-        }
 
         array.push({
           lat: dt.latitude, lng: dt.longitude, kota: dt.nama,

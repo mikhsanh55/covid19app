@@ -40,7 +40,7 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="positif-tbody">
+                                 <tbody id="positif-tbody">
                                     @if($pasiens->count() > 0)
                                         @foreach($pasiens as $pasien)
                                             <tr>
@@ -109,23 +109,23 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="odp-tbody">
+                          <tbody id="odp-tbody">
                                     @if($pasiens->count() > 0)
                                         @foreach($pasiens as $pasien)
                                             <tr>
                                                 <td>{{++$no2}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{$pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']}}</td>
+                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) }}</td>
                                                 <td>{{$pasien->data['Selesai OTG']}}</td>
-                                                <td>{{$pasien->data['Proses OTG']}}</td>
+                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) + $pasien->data['Selesai OTG'] }}</td>
 
                                                 <td>{{$pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']}}</td>
                                                 <td>{{$pasien->data['Selesai ODP']}}</td>
-                                                <td>{{$pasien->data['Proses ODP']}}</td>
+                                                <td>{{ ($pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']) + $pasien->data['Selesai ODP'] }}</td>
 
                                                 <td>{{$pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']}}</td>
                                                 <td>{{$pasien->data['Selesai PDP']}}</td>
-                                                <td>{{$pasien->data['Proses PDP']}}</td>
+                                                <td>{{ ($pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']) + $pasien->data['Selesai PDP'] }}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -197,14 +197,24 @@
                             item.data['Selesai ODP'] = parseInt(item.data['Selesai ODP'])
                             item.data['Proses PDP'] = parseInt(item.data['Proses PDP'])
                             item.data['Selesai PDP'] = parseInt(item.data['Selesai PDP'])
+                            item.data['Positif Aktif'] = parseInt(item.data['Positif Aktif'])
+                            item.data['Sembuh'] = parseInt(item.data['Sembuh'])
+                            item.data['Meninggal'] = parseInt(item.data['Meninggal'])
+                            item.data['Proses OTG'] = parseInt(item.data['Proses OTG'])
+                            item.data['Selesai OTG'] = parseInt(item.data['Selesai OTG'])
+                            item.data['Proses ODP'] = parseInt(item.data['Proses ODP'])
+                            item.data['Selesai ODP'] = parseInt(item.data['Selesai ODP'])
+                            item.data['Proses PDP'] = parseInt(item.data['Proses PDP'])
+                            item.data['Selesai PDP'] = parseInt(item.data['Selesai PDP'])
                             tbodyPositif += `
                                 <tr>
                                     <td>${++no}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Positif Aktif']}</td>
+                                    <td>${item.data['Positif Aktif'] - item.data['Sembuh'] - item.data['Meninggal']}</td>
+                                    
                                     <td>${item.data['Sembuh']}</td>
                                     <td>${item.data['Meninggal']}</td>
-                                    <td>${item.data['Positif Aktif'] + item.data['Sembuh'] + item.data['Meninggal']}</td>
+                                    <td>${item.data['Positif Aktif']}</td>
                                     <td class="btn-group w-100">
                                         <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
                                     </td>
@@ -214,17 +224,17 @@
                                 <tr>
                                     <td>${++no2}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Proses OTG']}</td>
+                                    <td>${item.data['Proses OTG'] - item.data['Selesai OTG']}</td>
                                     <td>${item.data['Selesai OTG']}</td>
-                                    <td>${item.data['Proses OTG'] + item.data['Selesai OTG']}</td>
+                                    <td>${item.data['Proses OTG']}</td>
 
-                                    <td>${item.data['Proses ODP']}</td>
+                                    <td>${item.data['Proses ODP'] - item.data['Selesai ODP']}</td>
                                     <td>${item.data['Selesai ODP']}</td>
-                                    <td>${item.data['Proses ODP'] + item.data['Selesai ODP']}</td>
+                                    <td>${item.data['Proses ODP']}</td>
 
-                                    <td>${item.data['Proses PDP']}</td>
+                                    <td>${item.data['Proses PDP'] - item.data['Selesai PDP']}</td>
                                     <td>${item.data['Selesai PDP']}</td>
-                                    <td>${item.data['Proses PDP'] + item.data['Selesai PDP']}</td>
+                                    <td>${item.data['Proses PDP']}</td>
                                     
                                     <td class="btn-group w-100">
                                         <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>

@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::get('pasien/data', 'PasienController@data');
 	Route::post('pasien/data-filter', 'PasienController@filter_data');
 	Route::post('pasien/data-detail-filter', 'PasienController@filter_detail_data');
+	Route::post('pasien/import', 'PasienController@importCsv');
 
 	// Wilayah Route
 	Route::get('/kecamatan/get-by-kota/{id}', 'Wilayah\Kecamatan@get_kecamatan_by_kota');

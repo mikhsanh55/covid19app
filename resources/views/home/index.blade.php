@@ -2,150 +2,88 @@
 @section('title_page', 'Pusat Informasi dan Koordinasi COVID-19 Papua Barat')
 @section('content')
 <div class="container mt-4">     
-
-            <div class="alert alert-primary" role="alert">
-               <h4> <p class="mb-0"><strong><b>Angka Kejadian Di Papua Barat.</b></strong></p> </h4>
+  <!--  -->
+    <div class="alert alert-primary" role="alert">
+               <h4> <p class="mb-0"><strong>Angka Kejadian Di Papua.</strong></p> </h4>
             <h4>   
-                <small class="text-muted"><em> Update Terakhir: {{$latest_update}} </em> </small>
+                <small class="text-muted"><em> Update Terakhir {{$latest_update}} </em> </small>
             </h4>
             </div>
             <div class="row">
-                <div class="col-lg-12 col-md-12">
+                <div class="col-lg-6 col-md-12">
                     <!-- CARD ICON -->
                     <div class="row">
-                    <!-- Positif -->
-                      <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4" style="background-color:rgb(252, 223, 224); border-radius: 20px;">
-                                <div class="card-body text-center" >
-                                  <h5><strong><b>POSITIF AKTIF</b></strong></h5>
-                                    <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                  <h5>
-                                    
-                                    <strong>
-                                      
-                                        {{$data_per_status['Positif Aktif']}} Orang
-                                      
-                                    </strong> 
-                                  </h5>
-
-                                </div>
-                            </div>
-                        </div>
-                    <!-- End Positif -->
-                    
-                    <!-- Positif Sembuh -->
+                    <!-- Papua -->
                         <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4 " style="background-color:rgb(211, 238, 227); border-radius: 20px;">
-                                <div class="card-body text-center" >
-                                    <h5><strong><b>SEMBUH</b></strong></h5>
-                                        <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h5>
-                                    <strong>
-                                      
-                                        {{$data_per_status['Sembuh']}} Orang
-                                      
-                                    </strong>
-                                    <h5>
-                                </div>
-                            </div>
-                        </div>
-                    <!-- End Positif Sembuh -->
-
-                        <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4" style="background-color:rgb(251, 234, 223); border-radius: 20px;">
+                            <div class="card card-icon mb-4" style="background-color:#ff6b6b; border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h5><strong><b>MENINGGAL</b></strong></h5>
+                                     <h4><strong>POSITIF</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h5>
-                                          <strong>
-                                      
-                                        {{$data_per_status['Meninggal']}} Orang
-                                      
-                                        </strong>
-                                    </h5>
+                                    <h4><strong>{{$data_per_status['Positif Aktif']}} Orang</strong></h4>
+                                </div>
+                            </div>
+                        </div><!-- Papua -->
+                         <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
+                                <div class="card-body text-center"  >
+                                     <h4><strong>SEMBUH</strong></h4>
+                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
+                                    <h4><strong>{{$data_per_status['Sembuh']}} Orang</strong></h4>
+                                </div>
+                            </div>
+                        </div><!-- Papua -->
+                         <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="card card-icon mb-4" style="background-color:#feca57; border-radius: 20px;">
+                                <div class="card-body text-center"  >
+                                     <h4><strong>MENINGGAL</strong></h4>
+                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
+                                    <h4><strong>{{$data_per_status['Meninggal']}} Orang</strong></h4>
+                                </div>
+                            </div>
+                        </div><!-- Papua -->
+                         <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
+                                <div class="card-body text-center"  >
+                                     <h4><strong>ODP</strong></h4>
+                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
+                                    <h4><strong>
+                                      @isset($data_per_status['ODP'])
+                                        {{$data_per_status['ODP'] + $data_per_status['Selesai ODP'] + $data_per_status['Proses ODP']}} Orang
+                                      @endisset
+                                    </strong></h4>
+                                </div>
+                            </div>
+                        </div><!-- Papua -->
+                         <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="card card-icon mb-4" style="background-color:#feca57; border-radius: 20px;">
+                                <div class="card-body text-center"  >
+                                     <h4><strong>PDP</strong></h4>
+                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
+                                    <h4><strong>
+                                      @isset($data_per_status['PDP'])
+                                      {{$data_per_status['PDP'] + $data_per_status['Selesai PDP'] + $data_per_status['Proses PDP']}} Orang
+                                    @endisset
+                                    </strong></h4>
+                                </div>
+                            </div>
+                        </div><!-- Papua -->
+                         <div class="col-lg-4 col-md-6 col-sm-6">
+                            <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
+                                <div class="card-body text-center"  >
+                                     <h4><strong>OTG</strong></h4>
+                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
+                                    <h4><strong>
+                                      @isset($data_per_status['OTG'])
+                                      {{$data_per_status['OTG'] + $data_per_status['Selesai OTG'] + $data_per_status['Proses OTG']}} Orang
+                                    @endisset
+                                    </strong></h4>
                                 </div>
                             </div>
                         </div><!-- Papua -->
                         
-                        <!-- ODP -->
-                        <div class="col-lg-4 col-md-6 col-sm-12 ">
-                            <div class="card card-icon mb-4"  style=" border-radius: 20px;">
-                                <div class="card-body text-center" >
-                                     <STRONG><p class="text-primary text-20 line-height-2 m-0"><b>ODP</b></p></STRONG>
-                                     <p class="text-secondary text-18 line-height-2 m-10"> ( Orang Dalam Pemantauan)</p>
-                                   <STRONG class="text-secondary text-24 line-height-1 m-10"> 
-                                    @isset($data_per_status['ODP'])
-                                      {{$data_per_status['ODP'] + $data_per_status['Selesai ODP'] + $data_per_status['Proses ODP']}} Orang
-                                    @endisset
-                                   </STRONG>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- PDP -->
-                        <div class="col-lg-4 col-md-6 col-sm-12 ">
-                            <div class="card card-icon mb-4" style=" border-radius: 20px;">
-                                <div class="card-body text-center">
-                                    <STRONG><p class="text-primary text-20 line-height-2 m-0"><b>PDP</b></p></STRONG>
-                                   <p class="text-secondary text-18 line-height-2 m-10">( Pasien Dalam Pengawasan)</p>
-                                   <strong class="text-secondary text-24 line-height-1 m-10"> 
-                                    
-                                      {{$data_per_status['PDP'] + $data_per_status['Selesai PDP'] + $data_per_status['Proses PDP'] }} Orang
-                                    
-                                   </strong>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- OTG  -->
-                        <div class="col-lg-4 col-md-6 col-sm-12 ">
-                            <div class="card card-icon mb-4" style=" border-radius: 20px;">
-                                <div class="card-body text-center">
-                                    <STRONG><p class="text-primary text-20 line-height-2 m-0"><b>OTG</b></p></STRONG>
-                                   <p class="text-secondary text-18 line-height-2 m-10">( Orang Tanpa Gejala )</p>
-                                   <strong class="text-secondary text-24 line-height-1 m-10"> 
-                                    
-                                        {{$data_per_status['OTG'] + $data_per_status['Proses OTG'] + $data_per_status['Selesai OTG'] }} Orang
-                                      
-                                   </strong>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End OTG -->
-                        
                     </div><!-- row -->
                 </div>
-                
-                
-            </div>
-
-             <div class="row">
-                <div class="col-md-6">
-                    <div class="card o-hidden mb-4" style="background-color:#00FA9A; border-radius: 10px">
-                        <div class="card-header d-flex align-items-center">
-                                <h3 class="w-50 float-left card-title m-0"><b>Call Center</b></h3>
-                                <blockquote class="blockquote">
-                                  <p class="mb-0">Nomor Darurat</p>
-                                  <footer class="blockquote-footer">
-                                    <i><a href="tel:{{$no_darurat->call_center}} " class="cite"> {{$no_darurat->call_center}} </a></i>
-                                    <cite title="Source Title" class="cite">Nomor Darurat</cite>
-                                  </footer>
-                                </blockquote> 
-                        </div>
-                    </div>
-                    <div class="card o-hidden mb-4"style="background-color:#00FA9A;border-radius: 10px">
-                        <div class="card-header d-flex align-items-center" >
-                            <h3 class="w-50 float-left card-title m-0"><b>Diskes Papua Barat</b></h3>
-                                 <blockquote class="blockquote">
-                                    <p class="mb-0">Nomor Diskes Papua Barat</p>
-                                <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->no_diskes}}" class="cite">{{$no_darurat->no_diskes}} </a></i><cite title="Source Title" class="cite">Pertanyaan Umum</cite></footer>
-                                </blockquote>           
-                        </div>
-                    </div>
-                </div>
-
-             <div class="col-md-6">
-                <!-- Carousel -->
+                <div class="col-md-6 mb-3">
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="carousel_wrap">
@@ -155,8 +93,8 @@
                                         <li data-target="#carouselExampleKeyboard" data-slide-to="1"></li>
                                         <li data-target="#carouselExampleKeyboard" data-slide-to="2"></li>
                                     </ol>
-                                    <div class="carousel-inner" id="carousel-body">
-                                      @if($slides->count() > 0)
+                                    <div class="carousel-inner">
+                                        @if($slides->count() > 0)
                                         @foreach($slides as $i => $slide)
                                           @if($i == 0)
                                             <div class="carousel-item active" style="overflow: hidden;">
@@ -199,9 +137,36 @@
                             </div>
                         </div>
                     </div>
-                <!-- End Carousel -->
+                </div>
+              </div>
+                
+          <!-- TABLE NO DARURAT -->
+            <div class="row">
+                <div class="col-md-6">
+                        <div class="card o-hidden mb-4" style="background-color:#00FA9A; border-radius: 10px">
+                            <div class="card-header d-flex align-items-center">
+                                <h3 class="w-50 float-left card-title m-0">Call Center</h3>
+                                <blockquote class="blockquote">
+                                  <p class="mb-0">Nomor Darurat</p>
+                                  <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->call_center}} " class="cite"> {{$no_darurat->call_center}} </a></i><cite title="Source Title" class="cite">Nomor Darurat</cite></footer>
+                                </blockquote> 
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card o-hidden mb-4"style="background-color:#00FA9A;border-radius: 10px">
+                        <div class="card-header d-flex align-items-center" >
+                            <h3 class="w-50 float-left card-title m-0">Diskes Papua Barat</h3>
+                                 <blockquote class="blockquote">
+                                    <p class="mb-0">Nomor Diskes Papua Barat</p>
+                                <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->no_diskes}} " class="cite">08134567890 </a></i><cite title="Source Title" class="cite">Pertanyaan Umum</cite></footer>
+                                </blockquote>           
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
         <br>
   <div class="row">
         <div class="col-md-12">
@@ -223,7 +188,13 @@
                <div class="card-body" id="data-penyebaran">
                       <div id="map" class="map content-center"><div id="popup"></div></div>
                       <div id="markerDetail" class="d-none"></div>
+                      <br>
+                      <div class="w-100" style="margin:auto;">
+                           <!-- <iframe src="https://www.arcgis.com/apps/EmbedMinimal/index.html?appid=77486be2775647d29db48f56254b5e36" style="margin:auto;width:100% !important;height: 400px !important;" ></iframe> -->
+                       </div>
                </div>
+               <!-- iFrame arc -->
+               
           </div>
       </div>   
     </div> <!-- endrow -->
@@ -233,6 +204,8 @@
               <!-- end of row -->
       <!-- Chart -->
       <div class="row">
+          
+        <!-- Sembuh, Positif Aktif, Meninggal Chart -->
         <div class="col-sm-12">
           <div class="card o-hidden mb-4">
             <section class="card-header d-flex align-items-center">
@@ -240,12 +213,28 @@
              </section>
              <section class="card-body row">
                 <div class="col-lg-12 col-sm-12 m-4">
-                    <canvas id="pasien-chart"></canvas>       
+                    <canvas id="pasien-positif-chart"></canvas>       
                 </div>  
              </section>
           </div>
           
         </div>
+        
+        <!-- ODP, PDP, OTG Chart -->
+        <div class="col-sm-12">
+          <div class="card o-hidden mb-4">
+            <section class="card-header d-flex align-items-center">
+                <h4> <p class="mb-0"><b><strong>Grafik Perkembangan Pasien COVID-19</strong></b></p> </h4>
+             </section>
+             <section class="card-body row">
+                <div class="col-lg-12 col-sm-12 m-4">
+                    <canvas id="pasien-odp-chart"></canvas>       
+                </div>  
+             </section>
+          </div>
+          
+        </div>
+        
       </div>
       <!-- End Chart -->
       <!-- Rumah Sakit dan Call Center -->
@@ -287,7 +276,7 @@
       </div> <!-- end of col-->
 
        <div class="alert alert-succes" role="alert">
-         <h4> <p class="mb-0"><b><strong>Hubungin Call Center Kabupaten dan Kota</strong></b></p> </h4>
+         <h4> <p class="mb-0"><b><strong>Hubungi Call Center Kabupaten dan Kota</strong></b></p> </h4>
       </div>
 
           <div class="col-md-12">
@@ -337,6 +326,8 @@
                   </div>
               </div>
           </div>
+
+  <!-- BARU -->
           <!-- end of col-->
     </div> <!-- end of row-->
 
@@ -407,6 +398,10 @@
           labels: [],
           datasets: []
         },
+        data2 = {
+            labels: [],
+            datasets: []
+        },
         ddPositif = [], ddSembuh = [], ddMeninggal = [], ddODP = [], ddPDP = [], ddOTG = []
     $.ajax({
       type: 'GET',
@@ -414,6 +409,7 @@
       dataType: 'JSON',
       success: function(res) {
         data1.labels = res.tanggal
+        data2.labels = res.tanggal
         // Data Sembuh
         data1.datasets.push({
           label: 'Sembuh',
@@ -436,28 +432,28 @@
         })
 
         // Data ODP
-        data1.datasets.push({
+        data2.datasets.push({
           label: 'ODP',
           borderColor: 'rgb(52, 152, 219)',
           data:res.data.odp
         })
 
         // Data PDP
-        data1.datasets.push({
+        data2.datasets.push({
           label: 'PDP',
           borderColor: 'rgb(241, 196, 15)',
           data:res.data.pdp
         })
 
         // Data OTG
-        data1.datasets.push({
+        data2.datasets.push({
           label: 'OTG',
           borderColor: 'rgb(127, 140, 141)',
           data:res.data.otg
         })
       }
     }).done(function() {
-        var ctx = $('#pasien-chart').get(0).getContext('2d'),
+        var ctx = $('#pasien-positif-chart').get(0).getContext('2d'),
             pasienChart = new Chart(ctx, {
               type: 'line',
               data: data1,
@@ -481,7 +477,32 @@
                   }
                 }
               }
-            })  
+            })
+        let odpCtx = $('#pasien-odp-chart').get(0).getContext('2d'),
+            pasienOdpChart = new Chart(odpCtx, {
+              type: 'line',
+              data: data2,
+              options: {
+                animation: {
+                  duration: 0 // disable animation
+                },
+                devicePixelRatio: 1,
+                hover: {
+                  mode: 'y',
+                  intersect: false,
+                  axis: 'x',
+                  animationDuration: 0,
+                },
+                scales: {
+                  ticks: {
+                      max: 5,
+                      min: 2,
+                      stepSize: 0.5,
+                      sampleSize: 20
+                  }
+                }
+              }
+            })
     })
 
     

@@ -15,6 +15,7 @@ class ContainerController extends Controller
     public function index()
     {   
         // print_r(Pasien::get_home_datas());exit;
+        // print_r(Pasien::get_latest_update());exit;
         return view('home/index', [
             'slides' => Slider::all(),
             'rumah_sakit' => RumahSakit::where('rujukan', '1')->get(),
@@ -34,6 +35,8 @@ class ContainerController extends Controller
     public function get_data_chart()
     {
         $data_pasiens = Pasien::get_data_chart();
+
+        // print_r($data_pasiens);exit;
         $tanggal = array_keys($data_pasiens);
         $data_sembuh = [];$data_meninggal = [];$data_aktif = [];
         $data_odp = [];$data_pdp = [];$data_otg = [];
@@ -60,7 +63,7 @@ class ContainerController extends Controller
             // }
 
             $data_sembuh[] = $data_pasiens[$i]['data']['Sembuh'];
-            $data_aktif[] = $data_pasiens[$i]['data']['Positif Aktif'];
+            $data_aktif[] = ($data_pasiens[$i]['data']['Positif Aktif'] - $data_pasiens[$i]['data']['Sembuh']) - $data_pasiens[$i]['data']['Meninggal'];
             $data_meninggal[] = $data_pasiens[$i]['data']['Meninggal'];
             $data_odp[] = $data_pasiens[$i]['data']['ODP'];
             $data_pdp[] = $data_pasiens[$i]['data']['PDP'];
@@ -86,7 +89,7 @@ class ContainerController extends Controller
     {
         $data_pasiens = Pasien::get_coordinates();
         $datas = [];
-        print_r($data_pasiens);exit;
+        // print_r($data_pasiens);exit;
         // foreach ($data_pasiens as $key => $value) {
         //  foreach($data_pasiens[$key] as $data) {
         //      array_push($datas, $data);
