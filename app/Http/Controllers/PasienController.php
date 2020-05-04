@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Crypt;
 use App\Pasien;
 use App\PasienStatus;
+use App\RumahSakit;
 use Validator;
 class PasienController extends Controller
 {
@@ -81,153 +82,91 @@ class PasienController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        // $data_pasiens = DB::table('pasiens as p')
-        //                     ->where('tgl_input', $request->input('tgl_input'))
-        //                     ->where('id_kabkota', $request->input('kota'))
-        //                     ->where('id_pasien_status', $request->input('status'))
-        //                     ->get();
-
-        // if($data_pasiens->count() > 0) {
-        //     return response()->json([
-        //         'msg' => ['Data pada tanggal ' . $request->input('tgl_input') . ' sudah ada']
-        //     ], 400);
-        // }
+        // Make requeted data writeable
+        $requestData = $request->all();
+        $status = $requestData['status'];
 
         // Validation
         if($request->input('status') == 1 || $request->input('status') == 3) {
-            $check_data_positif = DB::table('pasiens as p')
-                                        ->where('tgl_input', $request->input('tgl_input'))
-                                        ->where('id_kabkota', $request->input('kota'))
-                                        ->where('id_pasien_status', 2)
-                                        ->get();
-
-            $num = 0;
-            if($check_data_positif->count() > 0) {
-                foreach($check_data_positif as $data) {
-                    $num += $data->jumlah;
-                }
-
-                if($request->input('jumlah') > $num) {
-                    return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Jumlah data positif kurang']
-                    ], 400);
-                }
+            $parentData = Pasien::get_latest_data_by(2, $request->all());
+            if($parentData->count() > 0) {
+                $insertedParentData = new \App\Pasien();
+                $insertedParentData->id_kabkota = $requestData['kota'];
+                $insertedParentData->id_pasien_status = 2;
+                $insertedParentData->tgl_input = $requestData['tgl_input'];
+                $insertedParentData->jumlah = 0;      
+                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
+                $insertedParentData->save();    
             }
             else {
-                return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Data pasien Positif Aktif belum ada, harap diinputkan terlebih dahulu']
-                    ], 400);
+                $this->sendError(['Data Positif Aktif belum ada, harap inputkan terlebih dahulu'], 400);
             }
+            
         }
         else if($request->input('status') == 7) { // Selesai ODP
-            $check_data_positif = DB::table('pasiens as p')
-                                        ->where('tgl_input', $request->input('tgl_input'))
-                                        ->where('id_kabkota', $request->input('kota'))
-                                        ->where('id_pasien_status', 4)
-                                        ->get();
-
-            $num = 0;
-            if($check_data_positif->count() > 0) {
-                foreach($check_data_positif as $data) {
-                    $num += $data->jumlah;
-                }
-
-                if($request->input('jumlah') > $num) {
-                    return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Jumlah data proses ODP kurang']
-                    ], 400);
-                }
+            $parentData = Pasien::get_latest_data_by(4, $request->all());
+            if($parentData->count() > 0) {
+                // Insert parent data
+                $insertedParentData = new \App\Pasien();
+                $insertedParentData->id_kabkota = $requestData['kota'];
+                $insertedParentData->id_pasien_status = 4;
+                $insertedParentData->tgl_input = $requestData['tgl_input'];
+                $insertedParentData->jumlah = 0;      
+                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
+                $insertedParentData->save();
             }
             else {
-                return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Data pasien proses ODP belum ada, harap diinputkan terlebih dahulu']
-                    ], 400);
+                $this->sendError(['Data ODP Proses belum ada, harap inputkan terlebih dahulu'], 400);
             }
+                
         }
 
         else if($request->input('status') == 8) { // Selesai PDP
-            $check_data_positif = DB::table('pasiens as p')
-                                        ->where('tgl_input', $request->input('tgl_input'))
-                                        ->where('id_kabkota', $request->input('kota'))
-                                        ->where('id_pasien_status', 5)
-                                        ->get();
+            $parentData = Pasien::get_latest_data_by(5, $request->all());
 
-            $num = 0;
-            if($check_data_positif->count() > 0) {
-                foreach($check_data_positif as $data) {
-                    $num += $data->jumlah;
-                }
-
-                if($request->input('jumlah') > $num) {
-                    return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Jumlah data proses PDP kurang']
-                    ], 400);
-                }
+            if($parentData->count() > 0) {
+                // Insert parent data
+                $insertedParentData = new \App\Pasien();
+                $insertedParentData->id_kabkota = $requestData['kota'];
+                $insertedParentData->id_pasien_status = 5;
+                $insertedParentData->tgl_input = $requestData['tgl_input'];
+                $insertedParentData->jumlah = 0;      
+                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
+                $insertedParentData->save();
             }
             else {
-                return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Data pasien proses PDP belum ada, harap diinputkan terlebih dahulu']
-                    ], 400);
+                $this->sendError(['Data PDP Proses belum ada, harap inputkan terlebih dahulu'], 400);    
             }
         }
         else if($request->input('status') == 11) { // Selesai ODP
-            $check_data_positif = DB::table('pasiens as p')
-                                        ->where('tgl_input', $request->input('tgl_input'))
-                                        ->where('id_kabkota', $request->input('kota'))
-                                        ->where('id_pasien_status', 6)
-                                        ->get();
+            $parentData = Pasien::get_latest_data_by(6, $request->all());
 
-            $num = 0;
-            if($check_data_positif->count() > 0) {
-                foreach($check_data_positif as $data) {
-                    $num += $data->jumlah;
-                }
-
-                if($request->input('jumlah') > $num) {
-                    return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Jumlah data proses OTG kurang']
-                    ], 400);
-                }
+            if($parentData->count() > 0) {
+                // Insert parent data
+                $insertedParentData = new \App\Pasien();
+                $insertedParentData->id_kabkota = $requestData['kota'];
+                $insertedParentData->id_pasien_status = 6;
+                $insertedParentData->tgl_input = $requestData['tgl_input'];
+                $insertedParentData->jumlah = 0;      
+                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
+                $insertedParentData->save();
             }
             else {
-                return response()->json([
-                        'status' => FALSE,
-                        'msg' => ['Data pasien proses OTG belum ada, harap diinputkan terlebih dahulu']
-                    ], 400);
+                $this->sendError(['Data OTG Proses belum ada, harap inputkan terlebih dahulu'], 400);    
             }
+                
         }
 
-        // Set Proses data untuk pengurangan jika memilih status 7, 8, 11
-        // Pengurangan tidak jadi -- 29-04-2020
-
-        /*  ALGORITMA INSERT DATA
-        *   Sebelum diinsert, jumlahkan data sebelumnya
-        *   ke data yang akan di insert sesuai dengan statusnya
-        */
-
-        // 1. Get data yang ada berdasarkan status
+        // 1. Get data yang ada berdasarkan status (penambahan)
         $availableData = Pasien::get_data1_by('id_pasien_status', $request->input('status'), $request->all());
         // 2. Jumlahkan Data yang akan diinsert dengan data yang udah di get sebelumnya sesuai status
-        $requestData = $request->all();
+        
         $jumlah = $requestData['jumlah'];
         if($availableData->count() > 0) {
-            // foreach($availableData as $i => $data) {
-                $jumlah += $availableData[0]->sum_jumlah;
-            // }
+            $jumlah += $availableData[0]->sum_jumlah;
         }
         $requestData['sum_jumlah'] = $jumlah;
 
-        // return response()->json([
-        //     'status' => TRUE,
-        //     'data' => $request->all()
-        // ], 200);
         // 3. Insert Data
         $data = new \App\Pasien();
         $data->id_kabkota = $requestData['kota'];
@@ -515,5 +454,188 @@ class PasienController extends Controller
                 ], 400);
             }
         }
+    }
+
+    private function sendError(array $msg, $statusCode) {
+        return response()->json([
+            'status' => FALSE,
+            'msg' => $msg
+        ], $statusCode);
+    }
+
+    public function infografis() {
+        
+
+        // create canvas from image
+        $path_image = base_path('public/images/infografis/infografis.jpeg');
+        $image = imagecreatefromjpeg($path_image);
+
+        // Add color to canvas
+        $black = imagecolorallocate($image, 0, 0, 0);
+        $white = imagecolorallocate($image, 255, 255, 255);
+
+        // Set font
+        $font = base_path('public/fonts/BebasNeue-Regular.ttf');
+
+        // Define data
+        $rekapitulasi_data = Pasien::get_home_datas();
+        $rs = RumahSakit::get_rumah_sakits();
+        $data_positif = [ ($rekapitulasi_data['Positif Aktif'] - $rekapitulasi_data['Sembuh']) - $rekapitulasi_data['Meninggal'], $rekapitulasi_data['Sembuh'], $rekapitulasi_data['Meninggal'] ];
+        $data_odppdp = [$rekapitulasi_data['Proses ODP'], $rekapitulasi_data['Proses PDP']];
+
+        // Spacer untuk rekapitulasi data
+        $positif = [0, 80, 182];
+        $odp = [0, 140];
+        $result = Pasien::get_datas();
+
+        // Filter Datas
+        foreach($result as $i => $data) {
+            switch($data->id) {
+                case 436: 
+                    $datas[] = [
+                        'id' => 436,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 223, // start mulai write
+                        'startY' => 750
+                    ];
+                break;
+                case 437:
+                    $datas[] = [
+                        'id' => 437,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 373,
+                        'startY' => 750
+                    ];
+                break;
+                case 438:
+                    $datas[] = [
+                        'id' => 438,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 523,
+                        'startY' => 750
+                    ];
+                break;
+                case 439:
+                    $datas[] = [
+                        'id' => 439,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 673,
+                        'startY' => 750
+                    ];
+                break;
+                case 440:
+                    $datas[] = [
+                        'id' => 440,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 823,
+                        'startY' => 750
+                    ];
+                break;
+                case 446:
+                    $datas[] = [
+                        'id' => 446,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 973,
+                        'startY' => 750
+                    ];
+                break;
+                case 445:
+                    $datas[] = [
+                        'id' => 445,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 73,
+                        'startY' => 912
+                    ];
+                break;
+                case 441:
+                    $datas[] = [
+                        'id' => 441,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 230,
+                        'startY' => 912
+                    ];
+                break;
+                case 442:
+                    $datas[] = [
+                        'id' => 442,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 375,
+                        'startY' => 912
+                    ];
+                break;
+                case 476:
+                    $datas[] = [
+                        'id' => 476,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 530,
+                        'startY' => 912
+                    ];
+                break;
+                case 444:
+                    $datas[] = [
+                        'id' => 444,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 675,
+                        'startY' => 912
+                    ];
+                break;
+                case 443:
+                    $datas[] = [
+                        'id' => 443,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 830,
+                        'startY' => 912
+                    ];
+                break;
+                case 447:
+                    $datas[] = [
+                        'id' => 447,
+                        'data' => [ $data->data['Positif Aktif'], ($data->data['Positif Aktif'] - $data->data['Sembuh']) - $data->data['Meninggal'], $data->data['Sembuh'], $data->data['Meninggal'] ],
+                        'spacer' => [0, 20, 40, 60],
+                        'start' => 985,
+                        'startY' => 912
+                    ];
+                break;
+            } // end switch
+        }
+
+        // jumlah rs
+        for($i = 0;$i < count($rs);$i++) {
+            imagettftext($image, 42, 0, 850 + $odp[$i], 600, $black, $font, $rs[$i]);          
+        }
+
+
+        // untuk jumlah data positif
+        for($i = 0;$i < count($data_positif);$i++) {
+            imagettftext($image, 42, 0, 72 + $positif[$i], 600, $black, $font, $data_positif[$i]);      
+        }
+
+        // untuk jumlah data odp pdp
+        for($i = 0;$i < count($data_odppdp);$i++) {
+            imagettftext($image, 42, 0, 470 + $odp[$i], 600, $black, $font, $data_odppdp[$i]);      
+        }
+        // Sebaran Covid 19
+        foreach($datas as $i => $data) {
+            for($x = 0;$x < count($data['data']);$x++) {
+                imagettftext($image, 16, 0, $data['start'],$data['startY'] + $data['spacer'][$x], $white, $font, $data['data'][$x]);
+            }
+        }
+
+        header('Content-Type: image/jpeg');
+
+        imagejpeg($image);
+        imagedestroy($image);
     }
 }

@@ -93,4 +93,7 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::get('/slider/detail/{id}', 'SliderController@detail');
 	Route::post('/slider/update', 'SliderController@update');
 	Route::post('/slider/delete', 'SliderController@delete');
+
+	// Infografis
+	Route::get('/infografis', 'PasienController@infografis');
 });

@@ -19,7 +19,7 @@
                                 <div class="card-body text-center"  >
                                      <h4><strong>POSITIF</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h4><strong>{{$data_per_status['Positif Aktif']}} Orang</strong></h4>
+                                    <h4><strong>{{ ($data_per_status['Positif Aktif'] - $data_per_status['Sembuh']) - $data_per_status['Meninggal'] }} Orang</strong></h4>
                                 </div>
                             </div>
                         </div><!-- Papua -->
@@ -47,8 +47,8 @@
                                      <h4><strong>ODP</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
                                     <h4><strong>
-                                      @isset($data_per_status['ODP'])
-                                        {{$data_per_status['ODP'] + $data_per_status['Selesai ODP'] + $data_per_status['Proses ODP']}} Orang
+                                      @isset($data_per_status['Proses ODP'])
+                                        {{$data_per_status['Proses ODP']}} Orang
                                       @endisset
                                     </strong></h4>
                                 </div>
@@ -60,8 +60,8 @@
                                      <h4><strong>PDP</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
                                     <h4><strong>
-                                      @isset($data_per_status['PDP'])
-                                      {{$data_per_status['PDP'] + $data_per_status['Selesai PDP'] + $data_per_status['Proses PDP']}} Orang
+                                      @isset($data_per_status['Proses PDP'])
+                                      {{$data_per_status['Proses PDP']}} Orang
                                     @endisset
                                     </strong></h4>
                                 </div>
@@ -73,8 +73,8 @@
                                      <h4><strong>OTG</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
                                     <h4><strong>
-                                      @isset($data_per_status['OTG'])
-                                      {{$data_per_status['OTG'] + $data_per_status['Selesai OTG'] + $data_per_status['Proses OTG']}} Orang
+                                      @isset($data_per_status['Proses OTG'])
+                                      {{$data_per_status['Proses OTG']}} Orang
                                     @endisset
                                     </strong></h4>
                                 </div>
@@ -110,17 +110,17 @@
                                       @else 
                                           <div class="carousel-item active">
 
-                                              <img class="d-block w-100" src="{{ url('/images/products/cov2.jpg') }}" alt="First slide">
+                                              <img class="d-block w-100" src="{{ url('/public/images/products/cov2.jpg') }}" alt="First slide">
 
                                           </div>
                                           <div class="carousel-item">
 
-                                              <img class="d-block w-100" src="{{ url('/images/products/cov1.jpg') }}" alt="Second slide">
+                                              <img class="d-block w-100" src="{{ url('/public/images/products/cov1.jpg') }}" alt="Second slide">
 
                                           </div>
                                           <div class="carousel-item">
 
-                                              <img class="d-block w-100" src="{{ url('/images/products/cov3.jpg') }}" alt="Third slide">
+                                              <img class="d-block w-100" src="{{ url('/public/images/products/cov3.jpg') }}" alt="Third slide">
 
                                           </div>
                                         @endif
@@ -190,7 +190,7 @@
                       <div id="markerDetail" class="d-none"></div>
                       <br>
                       <div class="w-100" style="margin:auto;">
-                           <!-- <iframe src="https://www.arcgis.com/apps/EmbedMinimal/index.html?appid=77486be2775647d29db48f56254b5e36" style="margin:auto;width:100% !important;height: 400px !important;" ></iframe> -->
+                           <iframe id="arcgis" data-src="https://www.arcgis.com/apps/EmbedMinimal/index.html?appid=77486be2775647d29db48f56254b5e36" style="margin:auto;width:100% !important;height: 400px !important;" ></iframe>
                        </div>
                </div>
                <!-- iFrame arc -->
@@ -337,6 +337,7 @@
 @verbatim
 <script type="text/javascript">
   $(document).ready(function() {
+    $('#arcgis').prop('src', $('#arcgis').prop('data-src'))
     function convertDateToFriendly(date) {
       return new Date(date).toLocaleDateString()
     }

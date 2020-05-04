@@ -61,22 +61,13 @@ class Pasien extends Model
                 $pasien->nama_status = 'Meninggal';
             }
             else if($pasien->status == 4) {
-                $pasien->nama_status = 'ODP';
+                $pasien->nama_status = 'Proses ODP';
             }
             else if($pasien->status == 5) {
-                $pasien->nama_status = 'PDP';
+                $pasien->nama_status = 'Proses PDP';
             }
             else if($pasien->status == 6) {
-                $pasien->nama_status = 'OTG';
-            }
-            else if($pasien->status == 7) {
-                $pasien->nama_status = 'Selesai ODP';
-            }
-            else if($pasien->status == 8) {
-                $pasien->nama_status = 'Selesai PDP';
-            }
-            else if($pasien->status == 11) {
-                $pasien->nama_status = 'Selesai OTG';
+                $pasien->nama_status = 'Proses OTG';
             }
         }
         return $datas;
@@ -517,6 +508,19 @@ class Pasien extends Model
         }
 
         return $sum;    
+    }
+
+    /*
+    * buat ambil data paling update sesuai dengan statusnya
+    * @return array
+    */
+    public function Scopeget_latest_data_by($query, $status, $datas) {
+        $result = DB::table('pasiens as p')
+                        ->where('p.id_kabkota', $datas['kota'])
+                        ->where('id_pasien_status', $status)
+                        ->orderBy('tgl_input', 'desc')
+                        ->get();
+        return $result;
     }
 
 }

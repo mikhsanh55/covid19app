@@ -184,7 +184,7 @@
 	                </li> -->
 	                
 	                <li class="nav-item">
-	                    <a class="nav-item-hold" href="http://demos.ui-lib.com/gull-html-doc/" target="_self">
+	                    <a class="nav-item-hold" href="/infografis" target="_self">
 	                        
 	                        <span class="nav-text"><i class="i-Information pr-2"></i>Info Grafis</span>
 	                    </a>
