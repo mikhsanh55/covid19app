@@ -176,6 +176,12 @@
 	                        <span class="nav-text"><i class="i-File-Text--Image pr-2"></i>Slider</span>
 	                    </a>
 	                </li>
+	                <li class="nav-item">
+	                    <a class="nav-item-hold" href="/arcgis" target="_self">
+	                        
+	                        <span class="nav-text"><i class="i-File-Text--Image pr-2"></i>Peta Arcgis</span>
+	                    </a>
+	                </li>
 	                 <!-- <li class="nav-item" data-item="forms">
 	                    <a class="nav-item-hold" href="http://192.168.0.14/admincovid/artikel/">
 	                        

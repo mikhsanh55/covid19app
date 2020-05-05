@@ -9,13 +9,14 @@ use App\Slider;
 use App\RumahSakit;
 use App\Kontak;
 use App\NoDarurat;
+use App\Arcgis;
 class ContainerController extends Controller
 {
 
     public function index()
     {   
         // print_r(Pasien::get_home_datas());exit;
-        // print_r(Pasien::get_latest_update());exit;
+        // print_r(Arcgis::firstRecord());exit;
         return view('home/index', [
             'slides' => Slider::all(),
             'rumah_sakit' => RumahSakit::where('rujukan', '1')->get(),
@@ -23,7 +24,8 @@ class ContainerController extends Controller
             'no_darurat' => NoDarurat::first(),
             'no' => 0,
             'data_per_status' => Pasien::get_home_datas(),
-            'latest_update' => Pasien::get_latest_update()
+            'latest_update' => Pasien::get_latest_update(),
+            'arcgis_src' => Arcgis::firstRecord()->src
         ]);
     }
 

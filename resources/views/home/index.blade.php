@@ -10,7 +10,7 @@
             </h4>
             </div>
             <div class="row">
-                <div class="col-lg-6 col-md-12">
+                <div class="col-lg-12 col-md-12">
                     <!-- CARD ICON -->
                     <div class="row">
                     <!-- Papua -->
@@ -42,48 +42,100 @@
                             </div>
                         </div><!-- Papua -->
                          <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
-                                <div class="card-body text-center"  >
-                                     <h4><strong>ODP</strong></h4>
-                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h4><strong>
-                                      @isset($data_per_status['Proses ODP'])
-                                        {{$data_per_status['Proses ODP']}} Orang
-                                      @endisset
-                                    </strong></h4>
+                            <div class="card card-icon mb-4" style="border-radius: 20px;">
+                                <div class="card-body text-center" >
+                                     <h4 class="mb-4"><strong>Orang Dalam Pemantauan</strong></h4>
+                                     <div class="d-flex justify-content-center">
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP']}}</b></h3>
+                                         <p class="text-secondary">Proses ODP</p>
+                                         <b>{{ round($data_per_status['Proses ODP'] * 100 / ($data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Selesai ODP']}}</b></h3>
+                                         <p class="text-secondary">Selesai ODP</p>
+                                         <b>{{ round($data_per_status['Selesai ODP'] * 100 / ($data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']}}</b></h3>
+                                         <p class="text-secondary">Total ODP</p>
+                                       </div>
+                                     </div>
                                 </div>
                             </div>
                         </div><!-- Papua -->
                          <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4" style="background-color:#feca57; border-radius: 20px;">
+                            <div class="card card-icon mb-4" style="border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h4><strong>PDP</strong></h4>
-                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h4><strong>
-                                      @isset($data_per_status['Proses PDP'])
-                                      {{$data_per_status['Proses PDP']}} Orang
-                                    @endisset
-                                    </strong></h4>
+                                     <h4 class="mb-4"><strong>Pasien Dalam Pengawasan</strong></h4>
+                                      <div class="d-flex justify-content-center">
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP']}}</b></h3>
+                                         <p class="text-secondary">Proses PDP</p>
+                                         <b>{{ round($data_per_status['Proses PDP'] * 100 / ($data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Selesai PDP']}}</b></h3>
+                                         <p class="text-secondary">Selesai PDP</p>
+                                         <b>{{ round($data_per_status['Selesai PDP'] * 100 / ($data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']}}</b></h3>
+                                         <p class="text-secondary">Total PDP</p>
+                                       </div>
+                                     </div>
                                 </div>
                             </div>
                         </div><!-- Papua -->
                          <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
+                            <div class="card card-icon mb-4" style="border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h4><strong>OTG</strong></h4>
-                                         <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h4><strong>
-                                      @isset($data_per_status['Proses OTG'])
-                                      {{$data_per_status['Proses OTG']}} Orang
-                                    @endisset
-                                    </strong></h4>
+                                     <h4 class="mb-4"><strong>Orang Tanpa Gejala</strong></h4>
+                                     <div class="d-flex justify-content-center">
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG']}}</b></h3>
+                                         <p class="text-secondary">Proses OTG</p>
+                                         <b>{{ round($data_per_status['Proses OTG'] * 100 / ($data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Selesai OTG']}}</b></h3>
+                                         <p class="text-secondary">Selesai OTG</p>
+                                         <b>{{ round($data_per_status['Selesai OTG'] * 100 / ($data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']), 2 )  }}%</b>
+                                       </div>
+                                       <div class="p-2">
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']}}</b></h3>
+                                         <p class="text-secondary">Total OTG</p>
+                                       </div>
+                                     </div>
                                 </div>
                             </div>
                         </div><!-- Papua -->
                         
                     </div><!-- row -->
                 </div>
-                <div class="col-md-6 mb-3">
+              </div>
+          <!-- TABLE NO DARURAT -->
+            <div class="row">
+                <div class="col-md-6">
+                        <div class="card o-hidden mb-4" style="background-color:#00FA9A; border-radius: 10px">
+                            <div class="card-header d-flex align-items-center">
+                                <h3 class="w-50 float-left card-title m-0">Call Center</h3>
+                                <blockquote class="blockquote">
+                                  <p class="mb-0">Nomor Darurat</p>
+                                  <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->call_center}} " class="cite"> {{$no_darurat->call_center}} </a></i><cite title="Source Title" class="cite">Nomor Darurat</cite></footer>
+                                </blockquote> 
+                        </div>
+                        <div class="card-header d-flex align-items-center" >
+                                <h3 class="w-50 float-left card-title m-0">Diskes Papua Barat</h3>
+                                     <blockquote class="blockquote">
+                                        <p class="mb-0">Nomor Diskes Papua Barat</p>
+                                    <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->no_diskes}} " class="cite">{{$no_darurat->no_diskes}} </a></i><cite title="Source Title" class="cite">Pertanyaan Umum</cite></footer>
+                                    </blockquote>           
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
                     <div class="card text-left">
                         <div class="card-body">
                             <div class="carousel_wrap">
@@ -138,33 +190,6 @@
                         </div>
                     </div>
                 </div>
-              </div>
-                
-          <!-- TABLE NO DARURAT -->
-            <div class="row">
-                <div class="col-md-6">
-                        <div class="card o-hidden mb-4" style="background-color:#00FA9A; border-radius: 10px">
-                            <div class="card-header d-flex align-items-center">
-                                <h3 class="w-50 float-left card-title m-0">Call Center</h3>
-                                <blockquote class="blockquote">
-                                  <p class="mb-0">Nomor Darurat</p>
-                                  <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->call_center}} " class="cite"> {{$no_darurat->call_center}} </a></i><cite title="Source Title" class="cite">Nomor Darurat</cite></footer>
-                                </blockquote> 
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card o-hidden mb-4"style="background-color:#00FA9A;border-radius: 10px">
-                        <div class="card-header d-flex align-items-center" >
-                            <h3 class="w-50 float-left card-title m-0">Diskes Papua Barat</h3>
-                                 <blockquote class="blockquote">
-                                    <p class="mb-0">Nomor Diskes Papua Barat</p>
-                                <footer class="blockquote-footer"><i><a href="tel:{{$no_darurat->no_diskes}} " class="cite">08134567890 </a></i><cite title="Source Title" class="cite">Pertanyaan Umum</cite></footer>
-                                </blockquote>           
-                        </div>
-                    </div>
-                </div>
             </div>
 
         <br>
@@ -190,7 +215,7 @@
                       <div id="markerDetail" class="d-none"></div>
                       <br>
                       <div class="w-100" style="margin:auto;">
-                           <iframe id="arcgis" data-src="https://www.arcgis.com/apps/EmbedMinimal/index.html?appid=77486be2775647d29db48f56254b5e36" style="margin:auto;width:100% !important;height: 400px !important;" ></iframe>
+                           <iframe id="arcgis" data-src="{{$arcgis_src}}" style="margin:auto;width:100% !important;height: 400px !important;" ></iframe>
                        </div>
                </div>
                <!-- iFrame arc -->
@@ -337,7 +362,7 @@
 @verbatim
 <script type="text/javascript">
   $(document).ready(function() {
-    $('#arcgis').prop('src', $('#arcgis').prop('data-src'))
+    $('#arcgis').attr('src', $('#arcgis').attr('data-src'))
     function convertDateToFriendly(date) {
       return new Date(date).toLocaleDateString()
     }

@@ -129,11 +129,10 @@
     <!-- GOOGLE MAPS -->
     <script>
     	var base_uri = "{{asset('storage')}}"
-    	console.warn(base_uri)
     </script>
     <script src="{{url('/js/maps.js')}}"></script>
     @if(!empty($__env->yieldContent('script')))
     	@yield('script')
     @endif
 </body>
-</html>
+</html>	

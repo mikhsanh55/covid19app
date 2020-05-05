@@ -39,7 +39,6 @@ class PasienController extends Controller
     
     public function add()
     {
-        // print_r(Pasien::get_datas());exit;
         $title = 'Data Pasien COVID-19';
         $kotakab = DB::table('wilayah_kabkota')->where('id_provinsi', 33)->get();
         $pasiens = Pasien::get_datas();
