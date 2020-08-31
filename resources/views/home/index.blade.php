@@ -17,16 +17,16 @@
                         <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="card card-icon mb-4" style="background-color:#ff6b6b; border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h4><strong>POSITIF</strong></h4>
+                                     <h4><strong>POSITIF AKTIF</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
-                                    <h4><strong>{{ ($data_per_status['Positif Aktif'] - $data_per_status['Sembuh']) - $data_per_status['Meninggal'] }} Orang</strong></h4>
+                                    <h4><strong>{{ ($data_per_status['Positif Aktif']) }} Orang</strong></h4>
                                 </div>
                             </div>
                         </div><!-- Papua -->
                          <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="card card-icon mb-4" style="background-color:#1dd1a1; border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h4><strong>SEMBUH</strong></h4>
+                                     <h4><strong>POSITIF SEMBUH</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
                                     <h4><strong>{{$data_per_status['Sembuh']}} Orang</strong></h4>
                                 </div>
@@ -35,7 +35,7 @@
                          <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="card card-icon mb-4" style="background-color:#feca57; border-radius: 20px;">
                                 <div class="card-body text-center"  >
-                                     <h4><strong>MENINGGAL</strong></h4>
+                                     <h4><strong>POSITIF MENINGGAL</strong></h4>
                                          <p class="text-primary text-16 line-height-2 m-0">Papua Barat</p>
                                     <h4><strong>{{$data_per_status['Meninggal']}} Orang</strong></h4>
                                 </div>
@@ -47,17 +47,26 @@
                                      <h4 class="mb-4"><strong>Orang Dalam Pemantauan</strong></h4>
                                      <div class="d-flex justify-content-center">
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP'] - $data_per_status['Selesai ODP']}}</b></h3>
                                          <p class="text-secondary">Proses ODP</p>
-                                         <b>{{ round($data_per_status['Proses ODP'] * 100 / ($data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']), 2 )  }}%</b>
+                                         @if($data_per_status['Proses ODP'] != 0 )
+                                            <b>{{ round( ($data_per_status['Proses ODP'] - $data_per_status['Selesai ODP']) * 100 / $data_per_status['Proses ODP'], 2)  }}%</b>
+                                         @else
+                                            <b>0 %</b>
+                                         @endif   
                                        </div>
                                        <div class="p-2">
                                          <h3 class="text-success"><b>{{$data_per_status['Selesai ODP']}}</b></h3>
                                          <p class="text-secondary">Selesai ODP</p>
-                                         <b>{{ round($data_per_status['Selesai ODP'] * 100 / ($data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']), 2 )  }}%</b>
+
+                                         @if($data_per_status['Selesai ODP'] !== 0)
+                                            <b>{{ round($data_per_status['Selesai ODP'] * 100 / ($data_per_status['Proses ODP']), 2 )  }}%</b>
+                                         @else
+                                            <b>0 %</b>   
+                                         @endif
                                        </div>
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP'] + $data_per_status['Selesai ODP']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses ODP']}}</b></h3>
                                          <p class="text-secondary">Total ODP</p>
                                        </div>
                                      </div>
@@ -70,17 +79,25 @@
                                      <h4 class="mb-4"><strong>Pasien Dalam Pengawasan</strong></h4>
                                       <div class="d-flex justify-content-center">
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP'] - $data_per_status['Selesai PDP']}}</b></h3>
                                          <p class="text-secondary">Proses PDP</p>
-                                         <b>{{ round($data_per_status['Proses PDP'] * 100 / ($data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']), 2 )  }}%</b>
+                                         @if($data_per_status['Proses PDP'] !== 0)
+                                            <b>{{ round( ($data_per_status['Proses PDP'] - $data_per_status['Selesai PDP']) * 100 / $data_per_status['Proses PDP'], 2)  }}%</b>
+                                         @else
+                                            <b>0 %</b>   
+                                         @endif   
                                        </div>
                                        <div class="p-2">
                                          <h3 class="text-success"><b>{{$data_per_status['Selesai PDP']}}</b></h3>
                                          <p class="text-secondary">Selesai PDP</p>
-                                         <b>{{ round($data_per_status['Selesai PDP'] * 100 / ($data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']), 2 )  }}%</b>
+                                         @if($data_per_status['Selesai PDP'] !== 0)
+                                            <b>{{ round($data_per_status['Selesai PDP'] * 100 / ($data_per_status['Proses PDP']), 2 )  }}%</b>
+                                         @else
+                                            <b>0 %</b>
+                                         @endif   
                                        </div>
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP'] + $data_per_status['Selesai PDP']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses PDP']}}</b></h3>
                                          <p class="text-secondary">Total PDP</p>
                                        </div>
                                      </div>
@@ -93,17 +110,25 @@
                                      <h4 class="mb-4"><strong>Orang Tanpa Gejala</strong></h4>
                                      <div class="d-flex justify-content-center">
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG'] - $data_per_status['Selesai OTG']}}</b></h3>
                                          <p class="text-secondary">Proses OTG</p>
-                                         <b>{{ round($data_per_status['Proses OTG'] * 100 / ($data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']), 2 )  }}%</b>
+                                         @if($data_per_status['Proses OTG'] !== 0)
+                                            <b>{{ round( ($data_per_status['Proses OTG'] - $data_per_status['Selesai OTG']) * 100 / $data_per_status['Proses OTG'], 2)  }}%</b>
+                                         @else
+                                            <b>0 %</b>
+                                         @endif
                                        </div>
                                        <div class="p-2">
                                          <h3 class="text-success"><b>{{$data_per_status['Selesai OTG']}}</b></h3>
                                          <p class="text-secondary">Selesai OTG</p>
-                                         <b>{{ round($data_per_status['Selesai OTG'] * 100 / ($data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']), 2 )  }}%</b>
+                                         @if($data_per_status['Selesai OTG'] !== 0)
+                                            <b>{{ round($data_per_status['Selesai OTG'] * 100 / ($data_per_status['Proses OTG']), 2 )  }}%</b>
+                                         @else
+                                            <b>0 %</b>
+                                         @endif
                                        </div>
                                        <div class="p-2">
-                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG'] + $data_per_status['Selesai OTG']}}</b></h3>
+                                         <h3 class="text-success"><b>{{$data_per_status['Proses OTG']}}</b></h3>
                                          <p class="text-secondary">Total OTG</p>
                                        </div>
                                      </div>

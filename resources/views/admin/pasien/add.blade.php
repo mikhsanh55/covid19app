@@ -22,9 +22,9 @@
                         <div class="card-title mb-3">Tambah Data</div>
                         <div class="mt-4 mb-4" id="errors-display"></div>
                         <!-- Form import excel -->
-                        <!-- <form autocomplete="off" id="import-excel-form">
+                        <form autocomplete="off" id="import-excel-form">
                             <div class="form-group row">
-                                <label for="uploaded_file">File excel .xlsx, .xls</label>
+                                <label for="uploaded_file">Import data pasien via .CSV file</label>
                                 <div class="col-sm-12">
                                     <input type="file" id="uploaded_file" class="form-control" required>
                                 </div>
@@ -34,7 +34,7 @@
                                     <button type="submit" id="btn-import" class="btn btn-sm btn-success">Import</button>
                                 </div>
                             </div>
-                        </form> -->
+                        </form>
 
                         <form id="form-add-pasien" autocomplete="off">
                             <input type="hidden" name="_token" value="{{csrf_token()}}" id="_token">
@@ -100,7 +100,7 @@
                 <div class="card text-left">
                     <div class="card-body">
                         <h4 class="card-title mb-3">Data Pasien (Positif Aktif, Sembuh, dan Meninggal)</h4>
-                        <div class="table-responsive">
+                        <div class="table-responsive table-wrapper">
                             <form class="m-2">
                                 <div class="form-group row">
                                     <label for="tanggal" class="col-sm-1">Tanggal</label>
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                             </form>
-                            <table class="pasien_table display table table-striped table-bordered table-hover" style="width:100%">
+                            <table class="pasien_table display table table-striped table-bordered table-hover" style="width:100%" id="positif_table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -123,15 +123,15 @@
                                     </tr>
                                 </thead>
                                 <tbody id="positif-tbody">
-                                    @if($pasiens->count() > 0)
+                                    <!-- @if($pasiens->count() > 0)
                                         @foreach($pasiens as $pasien)
                                             <tr>
                                                 <td>{{++$no}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{ ($pasien->data['Positif Aktif'] - $pasien->data['Sembuh']) - $pasien->data['Meninggal'] }}</td>
+                                                <td>{{ ($pasien->data['Positif Aktif']) }}</td>
                                                 <td>{{$pasien->data['Sembuh']}}</td>
                                                 <td>{{$pasien->data['Meninggal']}}</td>
-                                                <td>{{$pasien->data['Positif Aktif']}}</td>
+                                                <td>{{$pasien->data['Positif Aktif'] + $pasien->data['Meninggal'] + $pasien->data['Sembuh']}}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -147,7 +147,7 @@
                                             <td class="d-none"></td>
                                             <td class="d-none"></td>
                                         </tr>
-                                    @endif      
+                                    @endif       -->
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -156,7 +156,7 @@
                                         <th>Positif Aktif</th>
                                         <th>Sembuh</th>
                                         <th>Meninggal</th>
-                                        <th>Jumlah</th>    
+                                        <th>Jumlah</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </tfoot>
@@ -173,8 +173,8 @@
                 <div class="card text-left">
                     <div class="card-body">
                         <h4 class="card-title mb-3">Data Pasien (OTG, ODP, PDP)</h4>
-                        <div class="table-responsive">
-                            <table class="pasien_table display table table-striped table-bordered table-hover" style="width:100%">
+                        <div class="table-responsive table-wrapper">
+                            <table class="pasien_table display table table-striped table-bordered table-hover" style="width:100%" id="odp_table">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -192,22 +192,22 @@
                                     </tr>
                                 </thead>
                                 <tbody id="odp-tbody">
-                                    @if($pasiens->count() > 0)
+                                   <!--  @if($pasiens->count() > 0)
                                         @foreach($pasiens as $pasien)
                                             <tr>
                                                 <td>{{++$no2}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) }}</td>
+                                                <td>{{ ($pasien->data['Proses OTG']) }}</td>
                                                 <td>{{$pasien->data['Selesai OTG']}}</td>
-                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) + $pasien->data['Selesai OTG'] }}</td>
+                                                <td>{{ ($pasien->data['Proses OTG']) + $pasien->data['Selesai OTG'] }}</td>
 
-                                                <td>{{$pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']}}</td>
+                                                <td>{{$pasien->data['Proses ODP']}}</td>
                                                 <td>{{$pasien->data['Selesai ODP']}}</td>
-                                                <td>{{ ($pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']) + $pasien->data['Selesai ODP'] }}</td>
+                                                <td>{{ ($pasien->data['Proses ODP']) + $pasien->data['Selesai ODP'] }}</td>
 
-                                                <td>{{$pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']}}</td>
+                                                <td>{{$pasien->data['Proses PDP']}}</td>
                                                 <td>{{$pasien->data['Selesai PDP']}}</td>
-                                                <td>{{ ($pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']) + $pasien->data['Selesai PDP'] }}</td>
+                                                <td>{{ ($pasien->data['Proses PDP']) + $pasien->data['Selesai PDP'] }}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -223,7 +223,7 @@
                                             <td class="d-none"></td>
                                             <td class="d-none"></td>
                                         </tr>
-                                    @endif      
+                                    @endif    -->   
                                 </tbody>
                                 <tfoot>
                                     <tr>
@@ -258,89 +258,154 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('.pasien_table').DataTable()
+            let tanggal = $(this).val(), _token = $('#_token').val()
+            getPositifDataTable()
+            getOdpDataTable()
+
+            function getOdpDataTable(tgl = null) {
+                $('#odp_table').DataTable({
+                    "paging": false,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "type": "POST",
+                        "url": "/pasien/get-datatables",
+                        "data": {
+                            "_token": _token,
+                            "tanggal": tgl === null ? null : tgl
+                        }
+                    },
+                    "columnDefs": [ // Disable order for some columns
+                        {"orderable": false, "targets": 2},
+                        {"orderable": false, "targets": 3},
+                        {"orderable": false, "targets": 4},
+                        {"orderable": false, "targets": 5},
+                        {"orderable": false, "targets": 6},
+                        {"orderable": false, "targets": 7},
+                        {"orderable": false, "targets": 8},
+                        {"orderable": false, "targets": 9},
+                        {"orderable": false, "targets": 10},
+                        {"orderable": false, "targets": 11},
+                    ],
+                    "columns": [ 
+                        {"data": "no"},
+                        {"data": "nama"},
+                        {
+                            "data": null,
+                            "render": d => d.data['Proses OTG']
+                        },
+                        {
+                            "data": null,
+                            "render": d => d.data['Selesai OTG']
+                        },
+                        {
+                            "data": null,
+                            "render": d => ( parseInt(d.data['Proses OTG']) + parseInt(d.data['Selesai OTG']) )
+                        },
+                        {
+                            "data": null,
+                            "render": d => d.data['Proses ODP']
+                        },
+                        {
+                            "data": null,
+                            "render": d => d.data['Selesai ODP']
+                        },
+                        {
+                            "data": null,
+                            "render": d => ( parseInt(d.data['Proses ODP']) + parseInt(d.data['Selesai ODP']) )
+                        },
+                        {
+                            "data": null,
+                            "render": d => d.data['Proses PDP']
+                        },
+                        {
+                            "data": null,
+                            "render": d => d.data['Selesai PDP']
+                        },
+                        {
+                            "data": null,
+                            "render": d => ( parseInt(d.data['Proses PDP']) + parseInt(d.data['Selesai PDP']) )
+                        },
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `<a href="${'/pasien/detail/' + d.encrypt_id}" class="btn btn-primary btn-sm"> Detail </a>`
+                            }
+                        }
+                    ]
+                })
+            }
+
+            function getPositifDataTable(tgl = null) {
+                $('#positif_table').DataTable({
+                    "paging": false,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "type": "POST",
+                        "url": "/pasien/get-datatables",
+                        "data": {
+                            "_token": _token,
+                            "tanggal": tgl === null ? null : tgl
+                        }
+                    },
+                    "columnDefs": [ // Disable order for some columns
+                        {"orderable": false, "targets": 2},
+                        {"orderable": false, "targets": 3},
+                        {"orderable": false, "targets": 4},
+                        {"orderable": false, "targets": 5},
+                        {"orderable": false, "targets": 6},
+                    ],
+                    "columns": [
+                        {"data": "no2"},
+                        {"data": "nama"},
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `${d.data['Positif Aktif']}`
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `${d.data['Sembuh']}`
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `${d.data['Meninggal']}`
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `${parseInt(d.data['Positif Aktif']) + parseInt(d.data['Meninggal']) + parseInt(d.data['Sembuh'])}`
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function(d) {
+                                return `<a href="${'/pasien/detail/' + d.encrypt_id}" class="btn btn-primary btn-sm"> Detail </a>`
+                            }
+                        }
+                    ]
+                })    
+            }
 
             // Filter tanggal
             $('#filter-tanggal').change(function() {
-                let tanggal = $(this).val(), _token = $('#_token').val(),
-                    tbodyPositif = '', tbodyOdp = '', no = 0, no2 = 0
-                $('#filter-tanggal-status').html('Loading...')
-                $.ajax({
-                    type:'POST',
-                    url: '/pasien/data-filter',
-                    data: {tanggal, _token},
-                    dataType: 'JSON',
-                    statusCode: {
-                        400: function(resp) {
-                            $('#filter-tanggal-status').empty()
-                            var errors = resp.responseJSON, errorsHtml = ''
-                            for(var error in errors) {
-                                errorsHtml = `
-                                <p class="alert alert-danger">
-                                    <small>${errors[error][0]}</small>
-                                </p>`
-                            }
-                            $('#filter-tanggal-status').html(errorsHtml)
-                        },
-                        500: function(resp) {
-                            $('#filter-tanggal-status').empty()    
-                            alert('Something errors on server')
-                            return false
-                        }
-                    },
-                    success: function(res) {
-                        $('#filter-tanggal-status').empty()
-                        res.data.forEach(function(item, i) {
-                            item.data['Positif Aktif'] = parseInt(item.data['Positif Aktif'])
-                            item.data['Sembuh'] = parseInt(item.data['Sembuh'])
-                            item.data['Meninggal'] = parseInt(item.data['Meninggal'])
-                            item.data['Proses OTG'] = parseInt(item.data['Proses OTG'])
-                            item.data['Selesai OTG'] = parseInt(item.data['Selesai OTG'])
-                            item.data['Proses ODP'] = parseInt(item.data['Proses ODP'])
-                            item.data['Selesai ODP'] = parseInt(item.data['Selesai ODP'])
-                            item.data['Proses PDP'] = parseInt(item.data['Proses PDP'])
-                            item.data['Selesai PDP'] = parseInt(item.data['Selesai PDP'])
-                            tbodyPositif += `
-                                <tr>
-                                    <td>${++no}</td>
-                                    <td>${item.nama}</td>
-                                    <td>${item.data['Positif Aktif'] - item.data['Sembuh'] - item.data['Meninggal']}</td>
-                                    
-                                    <td>${item.data['Sembuh']}</td>
-                                    <td>${item.data['Meninggal']}</td>
-                                    <td>${item.data['Positif Aktif']}</td>
-                                    <td class="btn-group w-100">
-                                        <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
-                                    </td>
-                                </tr>`
+                tanggal = $(this).val()
 
-                            tbodyOdp += `
-                                <tr>
-                                    <td>${++no2}</td>
-                                    <td>${item.nama}</td>
-                                    <td>${item.data['Proses OTG'] - item.data['Selesai OTG']}</td>
-                                    <td>${item.data['Selesai OTG']}</td>
-                                    <td>${item.data['Proses OTG']}</td>
+                // remove existing data
+                $('#positif_table').DataTable().clear()
+                $('#positif_table').DataTable().destroy()
+                $('#odp_table').DataTable().clear()
+                $('#odp_table').DataTable().destroy()
 
-                                    <td>${item.data['Proses ODP'] - item.data['Selesai ODP']}</td>
-                                    <td>${item.data['Selesai ODP']}</td>
-                                    <td>${item.data['Proses ODP']}</td>
-
-                                    <td>${item.data['Proses PDP'] - item.data['Selesai PDP']}</td>
-                                    <td>${item.data['Selesai PDP']}</td>
-                                    <td>${item.data['Proses PDP']}</td>
-                                    
-                                    <td class="btn-group w-100">
-                                        <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
-                                    </td>
-                                </tr>`     
-                        })
-
-                        $('#positif-tbody').html(tbodyPositif)
-                        $('#odp-tbody').html(tbodyOdp)             
-                    }
-                })
-
+                // Make a requests
+                getPositifDataTable(tanggal)
+                getOdpDataTable(tanggal)
             })
             $('#status').change(function() {
                 var html = '', val = $(this).val()
@@ -387,7 +452,6 @@
                     data: formData,
                     success: function(data) {
                         $('#btn-import').html('Import').removeAttr('disabled')
-                        alert(data.msg)
                     },
                     statusCode: {
                         400: function(resp) {
@@ -425,7 +489,6 @@
                     dataType:'JSON',
                     success:function(data) {
                         $('#btn-add-pasien').html('Tambah').removeAttr('disabled')
-                        alert(data.msg)
                     },
                     statusCode: {
                         400: function(resp) {

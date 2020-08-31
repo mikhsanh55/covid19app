@@ -113,7 +113,6 @@
 						dataType: 'JSON',
 						success:function(data) {
 							if(data.status)
-								alert(data.msg)
 								window.location.reload()
 						}
 					})
@@ -134,8 +133,6 @@
                     data: {tanggal, _token, _id},
                     dataType: 'JSON',
                     success: function(res) {
-                        console.log(res)
-                        
 
                         $('#filter-tanggal-status').empty()
                         if(res.data.length > 0) {
@@ -178,7 +175,6 @@
                                     dataType: 'JSON',
                                     success:function(data) {
                                         if(data.status)
-                                            alert(data.msg)
                                             window.location.reload()
                                     }
                                 })

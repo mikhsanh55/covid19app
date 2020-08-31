@@ -27,6 +27,30 @@
         height: 400px;
         width: 100%;
       }
+      #spacer {
+            margin-bottom:120px;
+        }
+      /*Smartphone*/
+      @media screen and (max-width: 500px) {
+            #tagline {
+                display:none;
+            }
+            .br-danger {
+                display:block;
+            }
+            #spacer {
+                margin-bottom:50px;
+            }
+        }
+      @media screen and (max-width: 800px) {
+            #tagline {
+                line-height:50px;
+                font-size:55%;
+            }
+            #spacer {
+                margin-bottom:135px;
+            }
+        }
     </style>
     <!-- Open Layers -->
     <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
@@ -35,67 +59,41 @@
 </head>
 
 <body>
-	   <!-- Mobile Menu Start Here -->
-<div class="mobile-menu seo-bg">
-  <nav class="mobile-header">
-    <div class="header-logo">
-      <a href="site/index.html"><img src="{{ url('/images/covid.png') }}" width="250px" alt="logo"></a>
-    </div>
-    <div class="header-bar">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </nav>
-  <nav class="mobile-menu">
-    <div class="mobile-menu-area">
-      <div class="mobile-menu-area-inner">
-        <ul class="lab-ul">
-          <li><a href="#">Home</a></li>
-              <li><a href="#">Data </a></li>             
-          <li><a href="#">Berita</a></li>
-          <li><a href="#">Kontak</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#"><span class="lab-btn">Call Center</span></a></li>          
-        </ul>
-      </div>
-    </div>
-  </nav>
-</div>
-<!-- Mobile Menu Ending Here -->
    <!-- Image and text -->
    <!-- Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-white">
-	    <div class="mx-auto order-0 ">
-	        <a class="navbar-brand" href="#">
-	            <img src="{{ url('/images/papua.png') }}" width="50" height="60" class="d-inline-block align-top" alt="">
-	            <strong></strong>Pusat Informasi & Koordinasi COVID-19 - Provinsi Papua Barat</strong> 
-	        </a>
-	        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
-	            <span class="navbar-toggler-icon"></span>
-	        </button>
-	    </div>
-	   
-	    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-	        <ul class="navbar-nav ml-auto d-flex align-items-center">
-	            <li class="nav-item">
-	                <a class="nav-link" href="/home">Home</a>
-	            </li>
-	            <li class="nav-item">
-	                <a class="nav-link" href="#data-penyebaran">Data</a>
-	            </li>
-	             <!-- <li class="nav-item">
-	                <a class="nav-link" href="#">Berita</a>
-	            </li> -->
-	            <li class="nav-item">
-	                <a class="nav-link" href="#kontak">Kontak</a>
-	            </li>
-	            <li class="nav-item">
-	                <a href="https://api.whatsapp.com/send?phone=08112543737"><button class="btn btn-danger btn-rounded btn-sm">Call Center</button></a>
-	            </li>
-	        </ul>
-	    </div>
-	</nav>
+    <nav class="navbar navbar-expand-md navbar-light bg-white d-flex justify-content-around align-items-center" style="position:fixed;top:0;width:100%;z-index:90;">
+      <div class="mx-auto col-sm-6">
+          <a class="navbar-brand" href="#">
+              <img src="{{ url('/public/images/papua.png') }}" width="50" height="60" class="d-inline-block align-top" alt="">
+              <strong id="tagline">
+              Pusat Informasi & Koordinasi COVID-19 - Provinsi Papua Barat</strong> 
+          </a>
+          <button class="navbar-toggler mr-3 mt-3" type="button" data-toggle="collapse" data-target=".dual-collapse2" style="position:absolute;right:0;">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+      </div>
+     
+      <div class="navbar-collapse collapse w-100 order-3 dual-collapse2 col-sm-6">
+          <ul class="navbar-nav ml-auto d-flex align-items-center">
+              <li class="nav-item">
+                  <a class="nav-link" href="/home">Home</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="#data-penyebaran">Data</a>
+              </li>
+               <!-- <li class="nav-item">
+                  <a class="nav-link" href="#">Berita</a>
+              </li> -->
+              <li class="nav-item">
+                  <a class="nav-link" href="#kontak">Kontak</a>
+              </li>
+              <li class="nav-item">
+                  <a href="https://api.whatsapp.com/send?phone=08112543737"><button class="btn btn-danger btn-rounded btn-sm">Call Center</button></a>
+              </li>
+          </ul>
+      </div>
+  </nav>
+  <div id="spacer"></div>
 	<!-- Dynamic Content -->
 	<!-- <div class="main-content-wrap sidenav-open " id="wrapper"> -->
 		<div class="app-admin-wrap">
@@ -128,7 +126,7 @@
     <script src="{{ url('/js/es5/script.min.js')}}"></script>
     <!-- GOOGLE MAPS -->
     <script>
-    	var base_uri = "{{asset('storage')}}"
+    	var base_uri = "/storage/app/public"
     </script>
     <script src="{{url('/js/maps.js')}}"></script>
     @if(!empty($__env->yieldContent('script')))

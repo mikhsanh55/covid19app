@@ -46,10 +46,10 @@
                                             <tr>
                                                 <td>{{++$no}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{ ($pasien->data['Positif Aktif'] - $pasien->data['Sembuh']) - $pasien->data['Meninggal'] }}</td>
+                                                <td>{{ $pasien->data['Positif Aktif'] }}</td>
                                                 <td>{{$pasien->data['Sembuh']}}</td>
                                                 <td>{{$pasien->data['Meninggal']}}</td>
-                                                <td>{{$pasien->data['Positif Aktif']}}</td>
+                                                <td>{{$pasien->data['Positif Aktif'] + $pasien->data['Meninggal'] + $pasien->data['Sembuh']}}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -115,17 +115,17 @@
                                             <tr>
                                                 <td>{{++$no2}}</td>
                                                 <td>{{$pasien->nama}}</td>
-                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) }}</td>
+                                                <td>{{ ($pasien->data['Proses OTG']) }}</td>
                                                 <td>{{$pasien->data['Selesai OTG']}}</td>
-                                                <td>{{ ($pasien->data['Proses OTG'] - $pasien->data['Selesai OTG']) + $pasien->data['Selesai OTG'] }}</td>
+                                                <td>{{ ($pasien->data['Proses OTG']) + $pasien->data['Selesai OTG'] }}</td>
 
-                                                <td>{{$pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']}}</td>
+                                                <td>{{$pasien->data['Proses ODP'] }}</td>
                                                 <td>{{$pasien->data['Selesai ODP']}}</td>
-                                                <td>{{ ($pasien->data['Proses ODP'] - $pasien->data['Selesai ODP']) + $pasien->data['Selesai ODP'] }}</td>
+                                                <td>{{ ($pasien->data['Proses ODP']) + $pasien->data['Selesai ODP'] }}</td>
 
-                                                <td>{{$pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']}}</td>
+                                                <td>{{$pasien->data['Proses PDP']}}</td>
                                                 <td>{{$pasien->data['Selesai PDP']}}</td>
-                                                <td>{{ ($pasien->data['Proses PDP'] - $pasien->data['Selesai PDP']) + $pasien->data['Selesai PDP'] }}</td>
+                                                <td>{{ ($pasien->data['Proses PDP']) + $pasien->data['Selesai PDP'] }}</td>
                                                 <td class="btn-group w-100">
                                                     <a class="btn btn-primary btn-sm" href="{{ url('/pasien/detail/') . '/'. $pasien->encrypt_id }}">Detail</a>
                                                 </td>
@@ -174,7 +174,11 @@
 @verbatim
     <script type="text/javascript">
         $(document).ready(function() {
+            // Initialize tables once when
             $('.pasien_table').DataTable()
+
+            let positifTable, odpTable
+
             // Filter tanggal
             $('#filter-tanggal').change(function() {
                 let tanggal = $(this).val(), _token = $('#_token').val(),
@@ -210,7 +214,7 @@
                                 <tr>
                                     <td>${++no}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Positif Aktif'] - item.data['Sembuh'] - item.data['Meninggal']}</td>
+                                    <td>${item.data['Positif Aktif']}</td>
                                     
                                     <td>${item.data['Sembuh']}</td>
                                     <td>${item.data['Meninggal']}</td>
@@ -224,17 +228,17 @@
                                 <tr>
                                     <td>${++no2}</td>
                                     <td>${item.nama}</td>
-                                    <td>${item.data['Proses OTG'] - item.data['Selesai OTG']}</td>
-                                    <td>${item.data['Selesai OTG']}</td>
                                     <td>${item.data['Proses OTG']}</td>
+                                    <td>${item.data['Selesai OTG']}</td>
+                                    <td>${item.data['Proses OTG'] + item.data['Selesai OTG']}</td>
 
-                                    <td>${item.data['Proses ODP'] - item.data['Selesai ODP']}</td>
-                                    <td>${item.data['Selesai ODP']}</td>
                                     <td>${item.data['Proses ODP']}</td>
+                                    <td>${item.data['Selesai ODP']}</td>
+                                    <td>${item.data['Proses ODP'] + item.data['Selesai ODP']}</td>
 
-                                    <td>${item.data['Proses PDP'] - item.data['Selesai PDP']}</td>
-                                    <td>${item.data['Selesai PDP']}</td>
                                     <td>${item.data['Proses PDP']}</td>
+                                    <td>${item.data['Selesai PDP']}</td>
+                                    <td>${item.data['Proses PDP'] + item.data['Selesai PDP']}</td>
                                     
                                     <td class="btn-group w-100">
                                         <a class="btn btn-primary btn-sm" href="/pasien/detail/${item.encrypt_id}">Detail</a>
@@ -245,6 +249,8 @@
                         $('#positif-tbody').html(tbodyPositif)
                         $('#odp-tbody').html(tbodyOdp)             
                     }
+                }).done(() => {
+                    $('.pasien_table').DataTable()
                 })
 
             })

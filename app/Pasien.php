@@ -90,7 +90,10 @@ class Pasien extends Model
         return $res;
     }
 
-    // Untuk table data pasien
+    /*
+    * MAIN FUNCTION untuk get data pasiens
+    * @return object array
+    */
     public function Scopeget_datas($query, $where = NULL)
     {
         
@@ -111,7 +114,7 @@ class Pasien extends Model
  
         // Get semua data pasien di group berdasarkan statusnya
         $datas = DB::table('pasiens as p')
-                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, p.id_pasien_status as status, tgl_input, sum_jumlah'))
+                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, p.id_pasien_status as status, tgl_input'))
                     ->join('pasien_status as s', 'p.id_pasien_status', '=', 's.key')
                     ->where('tgl_input', '<=', $this->latest_date)
                     ->groupBy('p.id_pasien_status', 'p.id_kabkota', 's.value', 'p.tgl_input')
@@ -125,7 +128,7 @@ class Pasien extends Model
                 // Seleksi data, ambil data yang ada diantara 3 kategori Positif, ODP, PDP, dan OTG
                 if($data->id_kabkota == $kota->id) {
                     if($data->tgl_input == $this->check_latest_date($data)) {
-                        $kota->data[$data->value][] = $data->sum_jumlah;    
+                        $kota->data[$data->value][] = $data->jml;    
                     }
                     // else {
                     //     unset($datas[$key]);
@@ -236,24 +239,49 @@ class Pasien extends Model
     }
 
     /*
-    * Untuk menampilkan semua status di dalam API Maps Openlayers
-    * @return array
+    * Return array object map for each cities in Papua Barat
+    *
     */
-    public function Scopeget_coordinates()
+    public function Scopeget_datas_map()
     {
-        // Set global date to latest updated date in db
-        $this->latest_date = $this->get_latest_date();
-
-        // get datas
-        $kotas = Pasien::get_datas();
-
-        foreach($kotas as $i => $kota) {
-            $kota->data['Proses ODP'] = $kota->data['Proses ODP'] - $kota->data['Selesai ODP'];
-            $kota->data['Proses PDP'] = $kota->data['Proses PDP'] - $kota->data['Selesai PDP'];
-            $kota->data['Proses OTG'] = $kota->data['Proses OTG'] - $kota->data['Selesai OTG'];
-            $kota->data['Positif Aktif'] = ($kota->data['Positif Aktif'] - $kota->data['Sembuh']) - $kota->data['Meninggal'];
+        // Get semua kota di Papua Barat
+        $kotas = DB::table('wilayah_kabkota as wk')
+                    ->where('wk.id_provinsi', 33)
+                    ->get();
+        foreach ($kotas as $i => $kota) {
+            $kota->encrypt_id = Crypt::encrypt($kota->id);
+            $kota->data = [];
         }
+ 
+        // Get semua data pasien di group berdasarkan statusnya
+        $datas = DB::table('pasiens as p')
+                    ->select(DB::raw('p.id_kabkota, s.value, SUM(jumlah) as jml, p.id_pasien_status as status'))
+                    ->join('pasien_status as s', 'p.id_pasien_status', '=', 's.key')
+                    ->groupBy('p.id_pasien_status', 'p.id_kabkota', 's.value')
+                    ->get();
+        $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'Selesai ODP', 'Proses ODP', 'Selesai PDP', 'Proses PDP', 'Selesai OTG', 'Proses OTG'];
 
+        // Cocokan, jika cocok masukan data pasien ke data kota 
+        foreach ($kotas as $i => $kota) {
+            foreach ($datas as $key => $data) {
+                // Seleksi data, ambil data yang ada diantara 3 kategori Positif, ODP, PDP, dan OTG
+                if($data->id_kabkota == $kota->id) {
+                    $kota->data[$data->value][] = $data->jml;    
+                }
+            }
+            $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'Selesai ODP', 'Proses ODP', 'Selesai PDP', 'Proses PDP', 'Selesai OTG', 'Proses OTG'];
+            // Lengkapi data yang tidak ada dengan diisi 0
+            for($i = 0;$i < count($category);$i++) {
+                if(!isset($kota->data[$category[$i]])) {
+                    $kota->data[$category[$i]] = 0;
+                }
+                else {
+                    $kota->data[$category[$i]] = $kota->data[$category[$i]][0];
+                }
+            }
+            $kota->encrypt_id = Crypt::encrypt($kota->id);
+            ksort($kota->data);
+        }   
         return $kotas;
     }
 
@@ -266,10 +294,11 @@ class Pasien extends Model
         $result = DB::table('pasiens as p')
                     ->select(DB::raw('SUM(p.jumlah) as jml, s.key, s.value'))
                     ->join('pasien_status as s', 'p.id_pasien_status', '=', 's.key')
+                    ->where('p.tgl_input', $this->get_latest_date())
                     ->groupBy('s.key', 's.value')
                     ->get();
         $data = [];
-        $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'ODP', 'Selesai ODP', 'Proses ODP', 'PDP', 'Selesai PDP', 'Proses PDP', 'OTG', 'Selesai OTG', 'Proses OTG'];
+        $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'Selesai ODP', 'Proses ODP', 'Selesai PDP', 'Proses PDP', 'Selesai OTG', 'Proses OTG'];
         foreach($result as $res) {
             $data[$res->value] = $res->jml;
         }
@@ -278,6 +307,7 @@ class Pasien extends Model
                 $data[$category[$i]] = 0;
             }
         }
+
         return $data;            
     }
 
@@ -288,11 +318,12 @@ class Pasien extends Model
     public function Scopeget_data_chart()
     {
         $result = DB::table('pasiens as p')
-                        ->select(DB::raw('p.tgl_input, SUM(p.jumlah) as jml, p.tgl_input, st.value'))
+                        ->select(DB::raw('p.tgl_input, SUM(p.jumlah) as jml, st.value'))
                         ->join('pasien_status as st', 'p.id_pasien_status', '=', 'st.key')
                         ->groupBy('p.tgl_input', 'p.jumlah', 'st.value')
                         ->orderBy('p.tgl_input', 'DESC')
                         ->get();
+        // $result = Pasien::get_datas();
         $datas = [];
         $tanggal = []; // buat tanggal
 
@@ -314,39 +345,39 @@ class Pasien extends Model
             foreach($data as $key => $d) {
                 switch($d->value) {
                     case 'Sembuh':
-                        $datas[$i]['data']['Sembuh'][] = $d->jml;
+                        $datas[$i]['data']['Sembuh'] = $d->jml;
                     break;
 
                     case 'Meninggal':
-                        $datas[$i]['data']['Meninggal'][] = $d->jml;
+                        $datas[$i]['data']['Meninggal'] = $d->jml;
                     break;
 
                     case 'Positif Aktif':
-                        $datas[$i]['data']['Positif Aktif'][] = $d->jml;
+                        $datas[$i]['data']['Positif Aktif'] = $d->jml;
                     break;
 
                     case 'Proses ODP':
-                        $datas[$i]['data']['ODP'][] = $d->jml;
+                        $datas[$i]['data']['ODP'] = $d->jml;
                     break;
 
                     case 'Selesai ODP':
-                        $datas[$i]['data']['ODPS'][] = $d->jml;
+                        $datas[$i]['data']['ODPS'] = $d->jml;
                     break;
 
                     case 'Proses PDP':
-                        $datas[$i]['data']['PDP'][] = $d->jml;
+                        $datas[$i]['data']['PDP'] = $d->jml;
                     break;
 
                     case 'Selesai PDP':
-                        $datas[$i]['data']['PDPS'][] = $d->jml;
+                        $datas[$i]['data']['PDPS'] = $d->jml;
                     break;
 
                     case 'Proses OTG':
-                        $datas[$i]['data']['OTG'][] = $d->jml;
+                        $datas[$i]['data']['OTG'] = $d->jml;
                     break;
 
                     case 'Selesai OTG':
-                        $datas[$i]['data']['OTGS'][] = $d->jml;
+                        $datas[$i]['data']['OTGS'] = $d->jml;
                     break;
                 }
             }
@@ -354,61 +385,41 @@ class Pasien extends Model
 
         // Sum all array data
         foreach($datas as $i => $data) {
-            if(isset($datas[$i]['data']['Sembuh'])) {
-                $datas[$i]['data']['Sembuh'] = array_sum($datas[$i]['data']['Sembuh']);    
+            if(!isset($datas[$i]['data']['Sembuh'])) {
+                $datas[$i]['data']['Sembuh'] = 0; 
             }
-            else {
-                $datas[$i]['data']['Sembuh'] = 0;       
+            if(!isset($datas[$i]['data']['Meninggal'])) {
+                $datas[$i]['data']['Meninggal'] = 0;
             }
-            if(isset($datas[$i]['data']['Meninggal'])) {
-                $datas[$i]['data']['Meninggal'] = array_sum($datas[$i]['data']['Meninggal']);
+            
+            if(!isset($datas[$i]['data']['Positif Aktif'])) {
+                $datas[$i]['data']['Positif Aktif'] = 0;
             }
-            else {
-                $datas[$i]['data']['Meninggal'] = 0;       
+            
+            if(!isset($datas[$i]['data']['ODP'])) {
+                $datas[$i]['data']['ODP'] = 0;
             }
-            if(isset($datas[$i]['data']['Positif Aktif'])) {
-                $datas[$i]['data']['Positif Aktif'] = array_sum($datas[$i]['data']['Positif Aktif']);
+            
+            if(!isset($datas[$i]['data']['ODPS'])) {
+                $datas[$i]['data']['ODPS'] = 0;
             }
-            else {
-                $datas[$i]['data']['Positif Aktif'] = 0;       
+            
+            if(!isset($datas[$i]['data']['PDP'])) {
+                $datas[$i]['data']['PDP'] = 0;
             }
-            if(isset($datas[$i]['data']['ODP'])) {
-                $datas[$i]['data']['ODP'] = array_sum($datas[$i]['data']['ODP']);
+            
+            if(!isset($datas[$i]['data']['PDPS'])) {
+                $datas[$i]['data']['PDPS'] = 0;
             }
-            else {
-                $datas[$i]['data']['ODP'] = 0;       
+            
+            if(!isset($datas[$i]['data']['OTG'])) {
+                $datas[$i]['data']['OTG'] = 0;
             }
-
-            if(isset($datas[$i]['data']['ODPS'])) {
-                $datas[$i]['data']['ODPS'] = array_sum($datas[$i]['data']['ODPS']);
+            
+            if(!isset($datas[$i]['data']['OTGS'])) {
+                $datas[$i]['data']['OTGS'] = 0;
             }
-            else {
-                $datas[$i]['data']['ODPS'] = 0;       
-            }
-            if(isset($datas[$i]['data']['PDP'])) {
-                $datas[$i]['data']['PDP'] = array_sum($datas[$i]['data']['PDP']);
-            }
-            else {
-                $datas[$i]['data']['PDP'] = 0;       
-            }
-            if(isset($datas[$i]['data']['PDPS'])) {
-                $datas[$i]['data']['PDPS'] = array_sum($datas[$i]['data']['PDPS']);
-            }
-            else {
-                $datas[$i]['data']['PDPS'] = 0;       
-            }
-            if(isset($datas[$i]['data']['OTG'])) {
-                $datas[$i]['data']['OTG'] = array_sum($datas[$i]['data']['OTG']);
-            }
-            else {
-                $datas[$i]['data']['OTG'] = 0;       
-            }
-            if(isset($datas[$i]['data']['OTGS'])) {
-                $datas[$i]['data']['OTGS'] = array_sum($datas[$i]['data']['OTGS']);
-            }
-            else {
-                $datas[$i]['data']['OTGS'] = 0;       
-            }
+            
         }
 
         return $datas;         
@@ -480,7 +491,7 @@ class Pasien extends Model
         $result = DB::table($this->table)
                         ->where($field, $where)
                         ->where('id_kabkota', $datas['kota'])
-                        ->orderBy('tgl_input', 'desc')
+                        ->orderBy('updated_at', 'desc')
                         ->get();
 
         return $result;
@@ -489,7 +500,7 @@ class Pasien extends Model
         $result = DB::table($this->table)
                         ->where($field, $where)
                         ->where('id_kabkota', $datas['kota'])
-                        ->orderBy('tgl_input', 'desc')
+                        ->orderBy('updated_at', 'desc')
                         ->get();
 
         return $result;

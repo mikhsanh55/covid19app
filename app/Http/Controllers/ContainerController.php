@@ -16,7 +16,6 @@ class ContainerController extends Controller
     public function index()
     {   
         // print_r(Pasien::get_home_datas());exit;
-        // print_r(Arcgis::firstRecord());exit;
         return view('home/index', [
             'slides' => Slider::all(),
             'rumah_sakit' => RumahSakit::where('rujukan', '1')->get(),
@@ -36,6 +35,7 @@ class ContainerController extends Controller
 
     public function get_data_chart()
     {
+        // print_r(Pasien::get_data_chart());exit;
         $data_pasiens = Pasien::get_data_chart();
 
         // print_r($data_pasiens);exit;
@@ -53,19 +53,18 @@ class ContainerController extends Controller
         }
         $data_pasiens = array_reverse($data_pasiens);
         foreach($data_pasiens as $i  => $data) {
-            // foreach($data as $key => $d) {
-                if($i > 0) {
-                    $data_pasiens[$i]['data']['ODP'] = $data_pasiens[$i]['data']['ODP'] + $data_pasiens[$i-1]['data']['ODP'];
-                    $data_pasiens[$i]['data']['PDP'] = $data_pasiens[$i]['data']['PDP'] + $data_pasiens[$i-1]['data']['PDP'];
-                    $data_pasiens[$i]['data']['OTG'] = $data_pasiens[$i]['data']['OTG'] + $data_pasiens[$i-1]['data']['OTG'];
-                    $data_pasiens[$i]['data']['Sembuh'] = $data_pasiens[$i]['data']['Sembuh'] + $data_pasiens[$i-1]['data']['Sembuh'];
-                    $data_pasiens[$i]['data']['Meninggal'] = $data_pasiens[$i]['data']['Meninggal'] + $data_pasiens[$i-1]['data']['Meninggal'];
-                    $data_pasiens[$i]['data']['Positif Aktif'] = $data_pasiens[$i]['data']['Positif Aktif'] + $data_pasiens[$i-1]['data']['Positif Aktif'];
-                }
+
+            //  if($i > 0) {
+            //     $data_pasiens[$i]['data']['ODP'] = $data_pasiens[$i]['data']['ODP'] + $data_pasiens[$i-1]['data']['ODP'];
+            //     $data_pasiens[$i]['data']['PDP'] = $data_pasiens[$i]['data']['PDP'] + $data_pasiens[$i-1]['data']['PDP'];
+            //     $data_pasiens[$i]['data']['OTG'] = $data_pasiens[$i]['data']['OTG'] + $data_pasiens[$i-1]['data']['OTG'];
+            //     $data_pasiens[$i]['data']['Sembuh'] = $data_pasiens[$i]['data']['Sembuh'] + $data_pasiens[$i-1]['data']['Sembuh'];
+            //     $data_pasiens[$i]['data']['Meninggal'] = $data_pasiens[$i]['data']['Meninggal'] + $data_pasiens[$i-1]['data']['Meninggal'];
+            //     $data_pasiens[$i]['data']['Positif Aktif'] = $data_pasiens[$i]['data']['Positif Aktif'] + $data_pasiens[$i-1]['data']['Positif Aktif'];
             // }
 
             $data_sembuh[] = $data_pasiens[$i]['data']['Sembuh'];
-            $data_aktif[] = ($data_pasiens[$i]['data']['Positif Aktif'] - $data_pasiens[$i]['data']['Sembuh']) - $data_pasiens[$i]['data']['Meninggal'];
+            $data_aktif[] = $data_pasiens[$i]['data']['Positif Aktif'];
             $data_meninggal[] = $data_pasiens[$i]['data']['Meninggal'];
             $data_odp[] = $data_pasiens[$i]['data']['ODP'];
             $data_pdp[] = $data_pasiens[$i]['data']['PDP'];
@@ -88,15 +87,10 @@ class ContainerController extends Controller
     }
 
     public function get_all_coordinates()
-    {
-        $data_pasiens = Pasien::get_coordinates();
-        $datas = [];
-        // print_r($data_pasiens);exit;
-        // foreach ($data_pasiens as $key => $value) {
-        //  foreach($data_pasiens[$key] as $data) {
-        //      array_push($datas, $data);
-        //  }
-        // }
+    {   
+        // print_r(Pasien::get_datas_map());exit;
+        $data_pasiens = Pasien::get_datas_map();
+        $datas = [];    
         return response()->json([
             'status' => TRUE,
             'data' => $data_pasiens

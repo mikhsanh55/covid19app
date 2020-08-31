@@ -1,5 +1,8 @@
 <?php
-
+/*
+* NOTE: versi app adalah versi request client yang mana setiap crud terutama 
+* insert, tidak ada keterkaitan satu sama lain
+*/
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -10,6 +13,7 @@ use App\Pasien;
 use App\PasienStatus;
 use App\RumahSakit;
 use Validator;
+use DataTables;
 class PasienController extends Controller
 {
     public function __construct()
@@ -25,7 +29,7 @@ class PasienController extends Controller
         // print_r($pasiens);exit;
         $no = 0;
         
-        return view('admin/pasien/data-pasien', ['kotakab' => $kotakab, 'pasiens' => $pasiens, 'no' => $no, 'title' => $title, 'no2' => 0, 'no3' => 0, 'latest_date' => Pasien::get_latest_date()]);   
+        return view('admin/pasien/data-pasien', [ 'latest_date' => Pasien::get_latest_date()]);   
     }
 
     public function detail($id)
@@ -42,6 +46,7 @@ class PasienController extends Controller
         $title = 'Data Pasien COVID-19';
         $kotakab = DB::table('wilayah_kabkota')->where('id_provinsi', 33)->get();
         $pasiens = Pasien::get_datas();
+        // print_r($pasiens);exit;
         $no = 0;
         $category = ['Sembuh', 'Positif Aktif', 'Meninggal', 'Selesai ODP', 'Proses ODP', 'Selesai PDP', 'Proses PDP', 'Selesai OTG', 'Proses OTG'];
             
@@ -65,6 +70,20 @@ class PasienController extends Controller
         return view('admin/pasien/edit', ['pasien' => $pasien, 'pasien_status' => $pasien_status, 'no' => 0, 'no2' => 0, 'no3' => 0]);
     }
 
+    /*
+    * Function mengurangi sum dari base status (POSITIF AKTIF, ODP Proses, PDP proses, dan OTG Proses)
+    *
+    * @return number
+    */
+    private function reduceSumJumlah($sum_jumlah, $num_reduce)
+    {
+        return ($sum_jumlah - $num_reduce);
+    }
+
+    /*
+    * Function untuk insert data pasien
+    * @return json
+    */
     public function insert(Request $request)
     {
         $rules = [
@@ -85,76 +104,10 @@ class PasienController extends Controller
         $requestData = $request->all();
         $status = $requestData['status'];
 
-        // Validation
-        if($request->input('status') == 1 || $request->input('status') == 3) {
-            $parentData = Pasien::get_latest_data_by(2, $request->all());
-            if($parentData->count() > 0) {
-                $insertedParentData = new \App\Pasien();
-                $insertedParentData->id_kabkota = $requestData['kota'];
-                $insertedParentData->id_pasien_status = 2;
-                $insertedParentData->tgl_input = $requestData['tgl_input'];
-                $insertedParentData->jumlah = 0;      
-                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
-                $insertedParentData->save();    
-            }
-            else {
-                $this->sendError(['Data Positif Aktif belum ada, harap inputkan terlebih dahulu'], 400);
-            }
-            
-        }
-        else if($request->input('status') == 7) { // Selesai ODP
-            $parentData = Pasien::get_latest_data_by(4, $request->all());
-            if($parentData->count() > 0) {
-                // Insert parent data
-                $insertedParentData = new \App\Pasien();
-                $insertedParentData->id_kabkota = $requestData['kota'];
-                $insertedParentData->id_pasien_status = 4;
-                $insertedParentData->tgl_input = $requestData['tgl_input'];
-                $insertedParentData->jumlah = 0;      
-                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
-                $insertedParentData->save();
-            }
-            else {
-                $this->sendError(['Data ODP Proses belum ada, harap inputkan terlebih dahulu'], 400);
-            }
-                
-        }
-
-        else if($request->input('status') == 8) { // Selesai PDP
-            $parentData = Pasien::get_latest_data_by(5, $request->all());
-
-            if($parentData->count() > 0) {
-                // Insert parent data
-                $insertedParentData = new \App\Pasien();
-                $insertedParentData->id_kabkota = $requestData['kota'];
-                $insertedParentData->id_pasien_status = 5;
-                $insertedParentData->tgl_input = $requestData['tgl_input'];
-                $insertedParentData->jumlah = 0;      
-                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
-                $insertedParentData->save();
-            }
-            else {
-                $this->sendError(['Data PDP Proses belum ada, harap inputkan terlebih dahulu'], 400);    
-            }
-        }
-        else if($request->input('status') == 11) { // Selesai ODP
-            $parentData = Pasien::get_latest_data_by(6, $request->all());
-
-            if($parentData->count() > 0) {
-                // Insert parent data
-                $insertedParentData = new \App\Pasien();
-                $insertedParentData->id_kabkota = $requestData['kota'];
-                $insertedParentData->id_pasien_status = 6;
-                $insertedParentData->tgl_input = $requestData['tgl_input'];
-                $insertedParentData->jumlah = 0;      
-                $insertedParentData->sum_jumlah = $parentData[0]->sum_jumlah;
-                $insertedParentData->save();
-            }
-            else {
-                $this->sendError(['Data OTG Proses belum ada, harap inputkan terlebih dahulu'], 400);    
-            }
-                
-        }
+        /*
+        * NOTE: versi app adalah versi request client yang mana setiap crud terutama 
+        * insert, tidak ada keterkaitan satu sama lain
+        */
 
         // 1. Get data yang ada berdasarkan status (penambahan)
         $availableData = Pasien::get_data1_by('id_pasien_status', $request->input('status'), $request->all());
@@ -361,10 +314,11 @@ class PasienController extends Controller
         ]);
     }
 
+    /*
+    * Function untuk import data pasien via CSV file
+    * @return json
+    */
     public function importCsv(Request $request) {
-        // set validation
-        
-
         // set temporary path from uploaded file
         $file = $request->file('uploaded_file');
         $filename = $file->getClientOriginalName();
@@ -372,9 +326,6 @@ class PasienController extends Controller
         $tempPath = $file->getRealPath();
 
         $valid_ext = ['csv'];
-
-        
-
 
         // if uploaded file is csv
         if(in_array(strtolower($ext), $valid_ext)) {
@@ -399,34 +350,13 @@ class PasienController extends Controller
                 foreach($import_data as $ind => $row) {
                     
                     // Add for data table
-                    if(count($inserted_data) >= 1) {
-                        $jumlah = intval($row[0][3]);
-                        $arrayStatus = [];
-                        foreach($inserted_data as $data) {
-                            if($row[0][1] == $data['id_pasien_status'] && $row[0][0] == $data['id_kabkota']) {
-                                $arrayStatus[] = $data['sum_jumlah'];    
-                            }
-                        }
-
-                        $jumlah += end($arrayStatus);
-
-                        $inserted_data[] = [
-                            'id_kabkota' => $row[0][0],
-                            'id_pasien_status' => $row[0][1],
-                            'tgl_input' => $row[0][2],
-                            'jumlah' => intval($row[0][3]),
-                            'sum_jumlah' => $jumlah
-                        ];
-                    }
-                    else {
-                        $inserted_data[] = [
-                            'id_kabkota' => $row[0][0],
-                            'id_pasien_status' => $row[0][1],
-                            'tgl_input' => $row[0][2],
-                            'jumlah' => intval($row[0][3]),
-                            'sum_jumlah' => intval($row[0][3])
-                        ];
-                    }
+                    $inserted_data[] = [
+                        'id_kabkota' => $row[0][0],
+                        'id_pasien_status' => $row[0][1],
+                        'tgl_input' => $row[0][2],
+                        'jumlah' => intval($row[0][3]),
+                        'sum_jumlah' => intval($row[0][3])
+                    ];
 
                 }
 
@@ -441,7 +371,7 @@ class PasienController extends Controller
                     return response()->json([
                         'status' => TRUE,
                         'msg' => 'Data gagal ditambah',
-                        'array' => $arrayStatus
+                        'array' => $import_data
                     ], 500);
                 }
 
@@ -452,6 +382,12 @@ class PasienController extends Controller
                     'msg' => ['Your file must be have at least 1 data']
                 ], 400);
             }
+        }
+        else {
+            return response()->json([
+                'status' => FALSE,
+                'msg' => ['File yang diupload harus berekstensi .csv']
+            ]);
         }
     }
 
@@ -636,5 +572,24 @@ class PasienController extends Controller
 
         imagejpeg($image);
         imagedestroy($image);
+    }
+
+    public function get_datatables(Request $request)
+    {
+        $datas = '';
+        if(null !== $request->input('tanggal')) {
+            $datas = Pasien::get_datas($request->input('tanggal'));
+        }
+        else {
+            $datas = Pasien::get_datas();    
+        }
+
+        $no = 0;$no2 = 0;
+        foreach($datas as $data) {
+            ksort($data->data);
+            $data->no = ++$no;
+            $data->no2 = ++$no2;
+        }
+        return DataTables::of($datas)->make(true);
     }
 }

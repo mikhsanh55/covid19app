@@ -13,15 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Get View using Get Method
-
-Route::get('/book-list/{id?}', function ($id = 2) {
-	return view('book_list', [
-		'order_no' => $id,
-		'book' => 'Laravel Book'
-	]);
-});
-
 // Home Route
 Route::redirect('/', '/home');
 Route::get('home/kontak', 'ContainerController@kontak');
@@ -44,6 +35,7 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::view('user/add', 'user/add');
 	Route::get('user/edit/{id}', 'UserController@edit');
 	Route::get('user/hapus/{id}', 'UserController@hapus');
+
 	// // user Route Logic
 	Route::post('user/insert', 'UserController@insert');
 	Route::put('user/update', 'UserController@update');
@@ -60,6 +52,8 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::post('pasien/data-filter', 'PasienController@filter_data');
 	Route::post('pasien/data-detail-filter', 'PasienController@filter_detail_data');
 	Route::post('pasien/import', 'PasienController@importCsv');
+	Route::post('pasien/data-tables', 'PasienController@datatables');
+	Route::post('pasien/get-datatables', 'PasienController@get_datatables');
 
 	// Wilayah Route
 	Route::get('/kecamatan/get-by-kota/{id}', 'Wilayah\Kecamatan@get_kecamatan_by_kota');
@@ -96,4 +90,8 @@ Route::group(['middleware' => 'auth'], function() {
 
 	// Infografis
 	Route::get('/infografis', 'PasienController@infografis');
+
+	// Arcgis
+	Route::get('/arcgis', 'ArcgisController@index');
+	Route::post('/arcgis/update', 'ArcgisController@update');
 });
